@@ -27,6 +27,7 @@ from ..compat import (
     compat_str,
 )
 from ..utils import (
+    bool_or_none,
     clean_html,
     dict_get,
     error_to_compat_str,
@@ -116,6 +117,8 @@ class YoutubeBaseInfoExtractor(InfoExtractor):
                 'f.req': json.dumps(f_req),
                 'flowName': 'GlifWebSignIn',
                 'flowEntry': 'ServiceLogin',
+                # TODO: reverse actual botguard identifier generation algo
+                'bgRequest': '["identifier",""]',
             })
             return self._download_json(
                 url, None, note=note, errnote=errnote,
@@ -368,10 +371,15 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                             (?:www\.)?hooktube\.com/|
                             (?:www\.)?yourepeat\.com/|
                             tube\.majestyc\.net/|
+                            # Invidious instances taken from https://github.com/omarroth/invidious/wiki/Invidious-Instances
                             (?:(?:www|dev)\.)?invidio\.us/|
-                            (?:www\.)?invidiou\.sh/|
-                            (?:www\.)?invidious\.snopyta\.org/|
+                            (?:(?:www|no)\.)?invidiou\.sh/|
+                            (?:(?:www|fi|de)\.)?invidious\.snopyta\.org/|
                             (?:www\.)?invidious\.kabi\.tk/|
+                            (?:www\.)?invidious\.enkirton\.net/|
+                            (?:www\.)?invidious\.13ad\.de/|
+                            (?:www\.)?invidious\.mastodon\.host/|
+                            (?:www\.)?tube\.poal\.co/|
                             (?:www\.)?vid\.wxzm\.sx/|
                             youtube\.googleapis\.com/)                        # the various hostnames, with wildcard subdomains
                          (?:.*?\#/)?                                          # handle anchor (#/) redirect urls
@@ -1888,6 +1896,9 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
         if view_count is None and video_details:
             view_count = int_or_none(video_details.get('viewCount'))
 
+        if is_live is None:
+            is_live = bool_or_none(video_details.get('isLive'))
+
         # Check for "rental" videos
         if 'ypc_video_rental_bar_text' in video_info and 'author' not in video_info:
             raise ExtractorError('"rental" videos not supported. See https://github.com/ytdl-org/youtube-dl/issues/359 for more information.', expected=True)
@@ -2421,7 +2432,7 @@ class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):
                         (%(playlist_id)s)
                      )""" % {'playlist_id': YoutubeBaseInfoExtractor._PLAYLIST_ID_RE}
     _TEMPLATE_URL = 'https://www.youtube.com/playlist?list=%s'
-    _VIDEO_RE = r'href="\s*/watch\?v=(?P<id>[0-9A-Za-z_-]{11})&amp;[^"]*?index=(?P<index>\d+)(?:[^>]+>(?P<title>[^<]+))?'
+    _VIDEO_RE = r'href="\s*/watch\?v=(?P<id>[0-9A-Za-z_-]{11})(?:&amp;(?:[^"]*?index=(?P<index>\d+))?(?:[^>]+>(?P<title>[^<]+))?)?'
     IE_NAME = 'youtube:playlist'
     _TESTS = [{
         'url': 'https://www.youtube.com/playlist?list=PLwiyx1dc3P2JR9N8gQaQN_BCvlSlap7re',
@@ -2444,6 +2455,8 @@ class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):
         'info_dict': {
             'title': '29C3: Not my department',
             'id': 'PLwP_SiAcdui0KVebT0mU9Apz359a4ubsC',
+            'uploader': 'Christiaan008',
+            'uploader_id': 'ChRiStIaAn008',
         },
         'playlist_count': 95,
     }, {
@@ -2452,6 +2465,8 @@ class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):
         'info_dict': {
             'title': '[OLD]Team Fortress 2 (Class-based LP)',
             'id': 'PLBB231211A4F62143',
+            'uploader': 'Wickydoo',
+            'uploader_id': 'Wickydoo',
         },
         'playlist_mincount': 26,
     }, {
@@ -2460,6 +2475,8 @@ class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):
         'info_dict': {
             'title': 'Uploads from Cauchemar',
             'id': 'UUBABnxM4Ar9ten8Mdjj1j0Q',
+            'uploader': 'Cauchemar',
+            'uploader_id': 'Cauchemar89',
         },
         'playlist_mincount': 799,
     }, {
@@ -2477,13 +2494,17 @@ class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):
         'info_dict': {
             'title': 'JODA15',
             'id': 'PL6IaIsEjSbf96XFRuNccS_RuEXwNdsoEu',
+            'uploader': 'milan',
+            'uploader_id': 'UCEI1-PVPcYXjB73Hfelbmaw',
         }
     }, {
         'url': 'http://www.youtube.com/embed/_xDOZElKyNU?list=PLsyOSbh5bs16vubvKePAQ1x3PhKavfBIl',
         'playlist_mincount': 485,
         'info_dict': {
-            'title': '2017 華語最新單曲 (2/24更新)',
+            'title': '2018 Chinese New Singles (11/6 updated)',
             'id': 'PLsyOSbh5bs16vubvKePAQ1x3PhKavfBIl',
+            'uploader': 'LBK',
+            'uploader_id': 'sdragonfang',
         }
     }, {
         'note': 'Embedded SWF player',
@@ -2492,13 +2513,16 @@ class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):
         'info_dict': {
             'title': 'JODA7',
             'id': 'YN5VISEtHet5D4NEvfTd0zcgFk84NqFZ',
-        }
+        },
+        'skip': 'This playlist does not exist',
     }, {
         'note': 'Buggy playlist: the webpage has a "Load more" button but it doesn\'t have more videos',
         'url': 'https://www.youtube.com/playlist?list=UUXw-G3eDE9trcvY2sBMM_aA',
         'info_dict': {
             'title': 'Uploads from Interstellar Movie',
             'id': 'UUXw-G3eDE9trcvY2sBMM_aA',
+            'uploader': 'Interstellar Movie',
+            'uploader_id': 'InterstellarMovie1',
         },
         'playlist_mincount': 21,
     }, {
@@ -2523,6 +2547,7 @@ class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):
         'params': {
             'skip_download': True,
         },
+        'skip': 'This video is not available.',
         'add_ie': [YoutubeIE.ie_key()],
     }, {
         'url': 'https://youtu.be/yeWKywCrFtk?list=PL2qgrgXsNUG5ig9cat4ohreBjYLAPC0J5',
@@ -2534,7 +2559,6 @@ class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):
             'uploader_id': 'backuspagemuseum',
             'uploader_url': r're:https?://(?:www\.)?youtube\.com/user/backuspagemuseum',
             'upload_date': '20161008',
-            'license': 'Standard YouTube License',
             'description': 'md5:800c0c78d5eb128500bffd4f0b4f2e8a',
             'categories': ['Nonprofits & Activism'],
             'tags': list,
@@ -2545,6 +2569,16 @@ class YoutubePlaylistIE(YoutubePlaylistBaseInfoExtractor):
             'noplaylist': True,
             'skip_download': True,
         },
+    }, {
+        # https://github.com/ytdl-org/youtube-dl/issues/21844
+        'url': 'https://www.youtube.com/playlist?list=PLzH6n4zXuckpfMu_4Ff8E7Z1behQks5ba',
+        'info_dict': {
+            'title': 'Data Analysis with Dr Mike Pound',
+            'id': 'PLzH6n4zXuckpfMu_4Ff8E7Z1behQks5ba',
+            'uploader_id': 'Computerphile',
+            'uploader': 'Computerphile',
+        },
+        'playlist_mincount': 11,
     }, {
         'url': 'https://youtu.be/uWyaPkt-VOI?list=PL9D9FC436B881BA21',
         'only_matching': True,
@@ -2711,6 +2745,8 @@ class YoutubeChannelIE(YoutubePlaylistBaseInfoExtractor):
         'info_dict': {
             'id': 'UUKfVa3S1e4PHvxWcwyMMg8w',
             'title': 'Uploads from lex will',
+            'uploader': 'lex will',
+            'uploader_id': 'UCKfVa3S1e4PHvxWcwyMMg8w',
         }
     }, {
         'note': 'Age restricted channel',
@@ -2720,6 +2756,8 @@ class YoutubeChannelIE(YoutubePlaylistBaseInfoExtractor):
         'info_dict': {
             'id': 'UUs0ifCMCm1icqRbqhUINa0w',
             'title': 'Uploads from Deus Ex',
+            'uploader': 'Deus Ex',
+            'uploader_id': 'DeusExOfficial',
         },
     }, {
         'url': 'https://invidio.us/channel/UC23qupoDRn9YOAVzeoxjOQA',
@@ -2804,6 +2842,8 @@ class YoutubeUserIE(YoutubeChannelIE):
         'info_dict': {
             'id': 'UUfX55Sx5hEFjoC3cNs6mCUQ',
             'title': 'Uploads from The Linux Foundation',
+            'uploader': 'The Linux Foundation',
+            'uploader_id': 'TheLinuxFoundation',
         }
     }, {
         # Only available via https://www.youtube.com/c/12minuteathlete/videos
@@ -2813,6 +2853,8 @@ class YoutubeUserIE(YoutubeChannelIE):
         'info_dict': {
             'id': 'UUVjM-zV6_opMDx7WYxnjZiQ',
             'title': 'Uploads from 12 Minute Athlete',
+            'uploader': '12 Minute Athlete',
+            'uploader_id': 'the12minuteathlete',
         }
     }, {
         'url': 'ytuser:phihag',
@@ -2906,7 +2948,7 @@ class YoutubePlaylistsIE(YoutubePlaylistsBaseInfoExtractor):
         'playlist_mincount': 4,
         'info_dict': {
             'id': 'ThirstForScience',
-            'title': 'Thirst for Science',
+            'title': 'ThirstForScience',
         },
     }, {
         # with "Load more" button
@@ -2923,6 +2965,7 @@ class YoutubePlaylistsIE(YoutubePlaylistsBaseInfoExtractor):
             'id': 'UCiU1dHvZObB2iP6xkJ__Icw',
             'title': 'Chem Player',
         },
+        'skip': 'Blocked',
     }]
 
 
