@@ -1700,6 +1700,15 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
         def extract_token(v_info):
             return dict_get(v_info, ('account_playback_token', 'accountPlaybackToken', 'token'))
 
+        def extract_player_response(player_response, video_id):
+            pl_response = str_or_none(player_response)
+            if not pl_response:
+                return
+            pl_response = self._parse_json(pl_response, video_id, fatal=False)
+            if isinstance(pl_response, dict):
+                add_dash_mpd_pr(pl_response)
+                return pl_response
+
         player_response = {}
 
         # Get video info
@@ -1722,7 +1731,10 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                 note='Refetching age-gated info webpage',
                 errnote='unable to download video info webpage')
             video_info = compat_parse_qs(video_info_webpage)
+            pl_response = video_info.get('player_response', [None])[0]
+            player_response = extract_player_response(pl_response, video_id)
             add_dash_mpd(video_info)
+            view_count = extract_view_count(video_info)
         else:
             age_gate = False
             video_info = None
@@ -1745,11 +1757,7 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                     is_live = True
                 sts = ytplayer_config.get('sts')
                 if not player_response:
-                    pl_response = str_or_none(args.get('player_response'))
-                    if pl_response:
-                        pl_response = self._parse_json(pl_response, video_id, fatal=False)
-                        if isinstance(pl_response, dict):
-                            player_response = pl_response
+                    player_response = extract_player_response(args.get('player_response'), video_id)
             if not video_info or self._downloader.params.get('youtube_include_dash_manifest', True):
                 add_dash_mpd_pr(player_response)
                 # We also try looking in get_video_info since it may contain different dashmpd
@@ -1781,9 +1789,7 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                     get_video_info = compat_parse_qs(video_info_webpage)
                     if not player_response:
                         pl_response = get_video_info.get('player_response', [None])[0]
-                        if isinstance(pl_response, dict):
-                            player_response = pl_response
-                            add_dash_mpd_pr(player_response)
+                        player_response = extract_player_response(pl_response, video_id)
                     add_dash_mpd(get_video_info)
                     if view_count is None:
                         view_count = extract_view_count(get_video_info)
@@ -1820,16 +1826,11 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
         video_details = try_get(
             player_response, lambda x: x['videoDetails'], dict) or {}
 
-        # title
-        if 'title' in video_info:
-            video_title = video_info['title'][0]
-        elif 'title' in player_response:
-            video_title = video_details['title']
-        else:
+        video_title = video_info.get('title', [None])[0] or video_details.get('title')
+        if not video_title:
             self._downloader.report_warning('Unable to extract video title')
             video_title = '_'
 
-        # description
         description_original = video_description = get_element_by_id("eow-description", video_webpage)
         if video_description:
 
@@ -1854,11 +1855,7 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
             ''', replace_url, video_description)
             video_description = clean_html(video_description)
         else:
-            fd_mobj = re.search(r'<meta name="description" content="([^"]+)"', video_webpage)
-            if fd_mobj:
-                video_description = unescapeHTML(fd_mobj.group(1))
-            else:
-                video_description = ''
+            video_description = self._html_search_meta('description', video_webpage) or video_details.get('shortDescription')
 
         if not smuggled_data.get('force_singlefeed', False):
             if not self._downloader.params.get('noplaylist'):
