@@ -33,6 +33,18 @@ MatchName=*DualPoint Stick
 MatchDMIModalias=dmi:*svnDellInc.:pnLatitudeD620*
 AttrTrackpointMultiplier=0.5
 
+[Latitude E5480 Trackpoint]
+MatchName=*DualPoint Stick
+MatchUdevType=pointingstick
+MatchDMIModalias=dmi:**bvnDellInc.:*:pnLatitude5480*
+AttrTrackpointMultiplier=0.5
+
+[Latitude 5580 Trackpoint]
+MatchName=*DualPoint Stick
+MatchUdevType=pointingstick
+MatchDMIModalias=dmi:**bvnDellInc.:*:pnLatitude5580*
+AttrTrackpointMultiplier=0.5
+
 [Latitude E5570 Trackpoint]
 MatchName=*DualPoint Stick
 MatchDMIModalias=dmi:*svnDellInc.:pnLatitudeE5570*
@@ -52,3 +64,12 @@ AttrTrackpointMultiplier=1.5
 MatchName=*DualPoint Stick
 MatchDMIModalias=dmi:*svnDellInc.:pnLatitudeE7470*
 AttrTrackpointMultiplier=0.125
+
+# The touch device has the same vid/pid as the totem, the MatchName
+# directive is required here
+[Canvas Totem]
+MatchName=*System Multi Axis
+MatchBus=usb
+MatchVendor=0x2575
+MatchProduct=0x0204
+ModelDellCanvasTotem=1

@@ -41,9 +41,3 @@ MatchDMIModalias=dmi:*svnHP:pnHPSpectrex360Convertible15-bl1XX:*
 AttrPressureRange=55:40
 AttrThumbPressureThreshold=90
 AttrPalmPressureThreshold=100
-
-[HP Spectre x360 Convertible 13-ap0xxx]
-MatchUdevType=tablet
-MatchName=ELAN2514:00 04F3:2812
-MatchDMIModalias=dmi:*svnHP:pnHPSpectrex360Convertible13-ap0xxx:*
-ModelTabletNoProximityOut=1
