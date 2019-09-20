@@ -9,3 +9,9 @@ MatchVendor=0x0B33
 MatchProduct=0x1000
 MatchUdevType=mouse
 ModelBouncingKeys=1
+
+[Contour Design RollerMouse Red v3]
+MatchVendor=0x0B33
+MatchProduct=0x1004
+MatchUdevType=mouse
+ModelBouncingKeys=1
