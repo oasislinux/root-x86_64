@@ -277,10 +277,7 @@ from .douyutv import (
     DouyuShowIE,
     DouyuTVIE,
 )
-from .dplay import (
-    DPlayIE,
-    DPlayItIE,
-)
+from .dplay import DPlayIE
 from .dreisat import DreiSatIE
 from .drbonanza import DRBonanzaIE
 from .drtuber import DrTuberIE
@@ -431,7 +428,6 @@ from .googlesearch import GoogleSearchIE
 from .goshgay import GoshgayIE
 from .gputechconf import GPUTechConfIE
 from .groupon import GrouponIE
-from .hark import HarkIE
 from .hbo import HBOIE
 from .hearthisat import HearThisAtIE
 from .heise import HeiseIE
@@ -549,7 +545,6 @@ from .lcp import (
     LcpPlayIE,
     LcpIE,
 )
-from .learnr import LearnrIE
 from .lecture2go import Lecture2GoIE
 from .lecturio import (
     LecturioIE,
@@ -601,13 +596,11 @@ from .lynda import (
     LyndaCourseIE
 )
 from .m6 import M6IE
-from .macgamestore import MacGameStoreIE
 from .mailru import (
     MailRuIE,
     MailRuMusicIE,
     MailRuMusicSearchIE,
 )
-from .makertv import MakerTVIE
 from .malltv import MallTVIE
 from .mangomolo import (
     MangomoloVideoIE,
@@ -673,7 +666,7 @@ from .mtv import (
     MTVVideoIE,
     MTVServicesEmbeddedIE,
     MTVDEIE,
-    MTV81IE,
+    MTVJapanIE,
 )
 from .muenchentv import MuenchenTVIE
 from .musicplayon import MusicPlayOnIE
@@ -1036,6 +1029,7 @@ from .snotr import SnotrIE
 from .sohu import SohuIE
 from .sonyliv import SonyLIVIE
 from .soundcloud import (
+    SoundcloudEmbedIE,
     SoundcloudIE,
     SoundcloudSetIE,
     SoundcloudUserIE,
@@ -1135,6 +1129,7 @@ from .telequebec import (
 from .teletask import TeleTaskIE
 from .telewebion import TelewebionIE
 from .tennistv import TennisTVIE
+from .tenplay import TenPlayIE
 from .testurl import TestURLIE
 from .tf1 import TF1IE
 from .tfo import TFOIE
@@ -1187,7 +1182,6 @@ from .tunein import (
 )
 from .tunepk import TunePkIE
 from .turbo import TurboIE
-from .tutv import TutvIE
 from .tv2 import (
     TV2IE,
     TV2ArticleIE,
