@@ -41,7 +41,7 @@ vis.ftdetect.filetypes = {
 	},
 	bash = {
 		ext = { "%.bash$", "%.csh$", "%.sh$", "%.zsh$" },
-		mime = { "text/x-shellscript" },
+		mime = { "text/x-shellscript", "application/x-shellscript" },
 	},
 	batch = {
 		ext = { "%.bat$", "%.cmd$" },
@@ -96,13 +96,13 @@ vis.ftdetect.filetypes = {
 		ext = { "%.desktop$" },
 	},
 	diff = {
-		ext = { "%.diff$", "%.patch$" },
+		ext = { "%.diff$", "%.patch$", "%.rej$" },
 	},
 	dmd = {
 		ext = { "%.d$", "%.di$" },
 	},
 	dockerfile = {
-		ext = { "^Dockerfile$" },
+		ext = { "^Dockerfile$", "%.Dockerfile$" },
 	},
 	dot = {
 		ext = { "%.dot$" },
@@ -118,6 +118,9 @@ vis.ftdetect.filetypes = {
 	},
 	erlang = {
 		ext = { "%.erl$", "%.hrl$" },
+	},
+	fantom = {
+		ext = { "%.fan$" },
 	},
 	faust = {
 		ext = { "%.dsp$" },
@@ -411,7 +414,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.xs$", "^%.xsin$", "^%.xsrc$" },
 	},
 	xml = {
-		ext = { "%.dtd$", "%.svg$", "%.xml$", "%.xsd$", "%.xsl$", "%.xslt$", "%.xul$" },
+		ext = { "%.dtd$", "%.plist$", "%.svg$", "%.xml$", "%.xsd$", "%.xsl$", "%.xslt$", "%.xul$" },
 	},
 	xtend = {
 		ext = {"%.xtend$" },
