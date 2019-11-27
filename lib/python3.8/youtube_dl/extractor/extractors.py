@@ -18,7 +18,6 @@ from .acast import (
     ACastIE,
     ACastChannelIE,
 )
-from .addanime import AddAnimeIE
 from .adn import ADNIE
 from .adobeconnect import AdobeConnectIE
 from .adobetv import (
@@ -223,7 +222,6 @@ from .comedycentral import (
     ComedyCentralTVIE,
     ToshIE,
 )
-from .comcarcoff import ComCarCoffIE
 from .commonmistakes import CommonMistakesIE, UnicodeBOMIE
 from .commonprotocols import (
     MmsIE,
@@ -253,10 +251,6 @@ from .dailymotion import (
     DailymotionIE,
     DailymotionPlaylistIE,
     DailymotionUserIE,
-)
-from .daisuki import (
-    DaisukiMottoIE,
-    DaisukiMottoPlaylistIE,
 )
 from .daum import (
     DaumIE,
@@ -513,6 +507,7 @@ from .keezmovies import KeezMoviesIE
 from .ketnet import KetnetIE
 from .khanacademy import KhanAcademyIE
 from .kickstarter import KickStarterIE
+from .kinja import KinjaEmbedIE
 from .kinopoisk import KinoPoiskIE
 from .konserthusetplay import KonserthusetPlayIE
 from .kontrtube import KontrTubeIE
@@ -628,7 +623,6 @@ from .microsoftvirtualacademy import (
     MicrosoftVirtualAcademyIE,
     MicrosoftVirtualAcademyCourseIE,
 )
-from .minhateca import MinhatecaIE
 from .ministrygrid import MinistryGridIE
 from .minoto import MinotoIE
 from .miomio import MioMioIE
@@ -638,7 +632,6 @@ from .mixcloud import (
     MixcloudIE,
     MixcloudUserIE,
     MixcloudPlaylistIE,
-    MixcloudStreamIE,
 )
 from .mlb import MLBIE
 from .mnet import MnetIE
@@ -932,10 +925,6 @@ from .rentv import (
 from .restudy import RestudyIE
 from .reuters import ReutersIE
 from .reverbnation import ReverbNationIE
-from .revision3 import (
-    Revision3EmbedIE,
-    Revision3IE,
-)
 from .rice import RICEIE
 from .rmcdecouverte import RMCDecouverteIE
 from .ro220 import Ro220IE
@@ -1241,6 +1230,7 @@ from .twitter import (
     TwitterCardIE,
     TwitterIE,
     TwitterAmplifyIE,
+    TwitterBroadcastIE,
 )
 from .udemy import (
     UdemyIE,
