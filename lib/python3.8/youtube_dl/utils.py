@@ -1716,13 +1716,16 @@ DATE_FORMATS = (
     '%B %d %Y',
     '%B %dst %Y',
     '%B %dnd %Y',
+    '%B %drd %Y',
     '%B %dth %Y',
     '%b %d %Y',
     '%b %dst %Y',
     '%b %dnd %Y',
+    '%b %drd %Y',
     '%b %dth %Y',
     '%b %dst %Y %I:%M',
     '%b %dnd %Y %I:%M',
+    '%b %drd %Y %I:%M',
     '%b %dth %Y %I:%M',
     '%Y %m %d',
     '%Y-%m-%d',
@@ -5219,6 +5222,19 @@ def decode_packed_codes(code):
     return re.sub(
         r'\b(\w+)\b', lambda mobj: symbol_table[mobj.group(0)],
         obfucasted_code)
+
+
+def caesar(s, alphabet, shift):
+    if shift == 0:
+        return s
+    l = len(alphabet)
+    return ''.join(
+        alphabet[(alphabet.index(c) + shift) % l] if c in alphabet else c
+        for c in s)
+
+
+def rot47(s):
+    return caesar(s, r'''!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~''', 47)
 
 
 def parse_m3u8_attributes(attrib):
