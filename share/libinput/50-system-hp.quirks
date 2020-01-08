@@ -42,6 +42,14 @@ AttrPressureRange=55:40
 AttrThumbPressureThreshold=90
 AttrPalmPressureThreshold=100
 
+[HP Spectre x360 Convertable 15-ch0xx]
+MatchUdevType=touchpad
+MatchName=*SynPS/2 Synaptics TouchPad
+MatchDMIModalias=dmi:*svnHP:pnHPSpectrex360Convertible15-ch0xx:*
+AttrThumbPressureThreshold=90
+AttrPalmPressureThreshold=100
+
+
 [HP Elite x2 1013 G3 Tablet Mode Switch]
 MatchName=*Intel Virtual Button*
 MatchDMIModalias=dmi:*svnHP:pnHPElitex21013G3:*
