@@ -9,10 +9,13 @@ from .common import (
     SearchInfoExtractor
 )
 from ..compat import (
+    compat_HTTPError,
+    compat_kwargs,
     compat_str,
     compat_urlparse,
 )
 from ..utils import (
+    error_to_compat_str,
     ExtractorError,
     float_or_none,
     HEADRequest,
@@ -28,7 +31,12 @@ from ..utils import (
 
 
 class SoundcloudEmbedIE(InfoExtractor):
-    _VALID_URL = r'https?://(?:w|player|p)\.soundcloud\.com/player/?.*?url=(?P<id>.*)'
+    _VALID_URL = r'https?://(?:w|player|p)\.soundcloud\.com/player/?.*?\burl=(?P<id>.+)'
+    _TEST = {
+        # from https://www.soundi.fi/uutiset/ennakkokuuntelussa-timo-kaukolammen-station-to-station-to-station-julkaisua-juhlitaan-tanaan-g-livelabissa/
+        'url': 'https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F922213810&show_artwork=true&maxwidth=640&maxheight=960&dnt=1&secret_token=s-ziYey',
+        'only_matching': True,
+    }
 
     @staticmethod
     def _extract_urls(webpage):
@@ -37,8 +45,13 @@ class SoundcloudEmbedIE(InfoExtractor):
             webpage)]
 
     def _real_extract(self, url):
-        return self.url_result(compat_urlparse.parse_qs(
-            compat_urlparse.urlparse(url).query)['url'][0])
+        query = compat_urlparse.parse_qs(
+            compat_urlparse.urlparse(url).query)
+        api_url = query['url'][0]
+        secret_token = query.get('secret_token')
+        if secret_token:
+            api_url = update_url_query(api_url, {'secret_token': secret_token[0]})
+        return self.url_result(api_url)
 
 
 class SoundcloudIE(InfoExtractor):
@@ -245,7 +258,6 @@ class SoundcloudIE(InfoExtractor):
     _API_BASE = 'https://api.soundcloud.com/'
     _API_V2_BASE = 'https://api-v2.soundcloud.com/'
     _BASE_URL = 'https://soundcloud.com/'
-    _CLIENT_ID = 'UW9ajvMgVdMMW3cdeBi8lPfN6dvOVGji'
     _IMAGE_REPL_RE = r'-([0-9a-z]+)\.jpg'
 
     _ARTWORK_MAP = {
@@ -261,9 +273,49 @@ class SoundcloudIE(InfoExtractor):
         'original': 0,
     }
 
+    def _store_client_id(self, client_id):
+        self._downloader.cache.store('soundcloud', 'client_id', client_id)
+
+    def _update_client_id(self):
+        webpage = self._download_webpage('https://soundcloud.com/', None)
+        for src in reversed(re.findall(r'<script[^>]+src="([^"]+)"', webpage)):
+            script = self._download_webpage(src, None, fatal=False)
+            if script:
+                client_id = self._search_regex(
+                    r'client_id\s*:\s*"([0-9a-zA-Z]{32})"',
+                    script, 'client id', default=None)
+                if client_id:
+                    self._CLIENT_ID = client_id
+                    self._store_client_id(client_id)
+                    return
+        raise ExtractorError('Unable to extract client id')
+
+    def _download_json(self, *args, **kwargs):
+        non_fatal = kwargs.get('fatal') is False
+        if non_fatal:
+            del kwargs['fatal']
+        query = kwargs.get('query', {}).copy()
+        for _ in range(2):
+            query['client_id'] = self._CLIENT_ID
+            kwargs['query'] = query
+            try:
+                return super(SoundcloudIE, self)._download_json(*args, **compat_kwargs(kwargs))
+            except ExtractorError as e:
+                if isinstance(e.cause, compat_HTTPError) and e.cause.code == 401:
+                    self._store_client_id(None)
+                    self._update_client_id()
+                    continue
+                elif non_fatal:
+                    self._downloader.report_warning(error_to_compat_str(e))
+                    return False
+                raise
+
+    def _real_initialize(self):
+        self._CLIENT_ID = self._downloader.cache.load('soundcloud', 'client_id') or 'YUKXoArFcqrlQn9tfNHvvyfnDISj04zk'
+
     @classmethod
     def _resolv_url(cls, url):
-        return SoundcloudIE._API_V2_BASE + 'resolve?url=' + url + '&client_id=' + cls._CLIENT_ID
+        return SoundcloudIE._API_V2_BASE + 'resolve?url=' + url
 
     def _extract_info_dict(self, info, full_title=None, secret_token=None, version=2):
         track_id = compat_str(info['id'])
@@ -441,9 +493,7 @@ class SoundcloudIE(InfoExtractor):
 
         track_id = mobj.group('track_id')
 
-        query = {
-            'client_id': self._CLIENT_ID,
-        }
+        query = {}
         if track_id:
             info_json_url = self._API_V2_BASE + 'tracks/' + track_id
             full_title = track_id
@@ -526,7 +576,6 @@ class SoundcloudPagedPlaylistBaseIE(SoundcloudPlaylistBaseIE):
     def _extract_playlist(self, base_url, playlist_id, playlist_title):
         COMMON_QUERY = {
             'limit': 2000000000,
-            'client_id': self._CLIENT_ID,
             'linked_partitioning': '1',
         }
 
@@ -712,9 +761,7 @@ class SoundcloudPlaylistIE(SoundcloudPlaylistBaseIE):
         mobj = re.match(self._VALID_URL, url)
         playlist_id = mobj.group('id')
 
-        query = {
-            'client_id': self._CLIENT_ID,
-        }
+        query = {}
         token = mobj.group('token')
         if token:
             query['secret_token'] = token
@@ -751,7 +798,6 @@ class SoundcloudSearchIE(SearchInfoExtractor, SoundcloudIE):
             self._MAX_RESULTS_PER_PAGE)
         query.update({
             'limit': limit,
-            'client_id': self._CLIENT_ID,
             'linked_partitioning': 1,
             'offset': 0,
         })
