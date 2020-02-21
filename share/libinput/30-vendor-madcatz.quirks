@@ -22,3 +22,19 @@ MatchVendor=0x0738
 MatchProduct=0x1703
 # EV_KEY 0x115, 0x116, 0x117
 AttrEventCodeDisable=EV_KEY:0x115;EV_KEY:0x116;EV_KEY:0x117
+
+# Like the Madcatz RAT3, but with different codes:
+# event8   POINTER_BUTTON   +0.488s	??? (280) pressed, seat count: 1
+# event8   POINTER_BUTTON   +1.275s	??? (280) released, seat count: 0
+# event8   POINTER_BUTTON   +1.275s	??? (281) pressed, seat count: 1
+# event8   POINTER_BUTTON   +3.585s	??? (281) released, seat count: 0
+# event8   POINTER_BUTTON   +3.585s	??? (282) pressed, seat count: 1
+# event8   POINTER_BUTTON   +4.184s	??? (280) pressed, seat count: 1
+# event8   POINTER_BUTTON   +4.184s	??? (282) released, seat count: 0
+[Madcatz RAT7]
+MatchUdevType=mouse
+MatchBus=usb
+MatchVendor=0x0738
+MatchProduct=0x1708
+# EV_KEY 0x118, 0x119, 0x11A
+AttrEventCodeDisable=EV_KEY:0x118;EV_KEY:0x119;EV_KEY:0x11A
