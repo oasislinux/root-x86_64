@@ -116,6 +116,9 @@ vis.ftdetect.filetypes = {
 	elixir = {
 		ext = { "%.ex$", "%.exs$" },
 	},
+	elm = {
+		ext = { "%.elm$" },
+	},
 	erlang = {
 		ext = { "%.erl$", "%.hrl$" },
 	},
@@ -151,6 +154,13 @@ vis.ftdetect.filetypes = {
 	},
 	gherkin = {
 		ext = { "%.feature$" },
+	},
+	['git-commit'] = {
+		ext = { "^COMMIT_EDITMSG$" },
+		cmd = { "set colorcolumn 72" },
+	},
+	['git-rebase'] = {
+		ext = { "git%-rebase%-todo" },
 	},
 	glsl = {
 		ext = { "%.glslf$", "%.glslv$" },
@@ -202,6 +212,9 @@ vis.ftdetect.filetypes = {
 	},
 	jsp = {
 		ext = { "%.jsp$" },
+	},
+	julia = {
+		ext = { "%.jl$" },
 	},
 	latex = {
 		ext = { "%.bbl$", "%.cls$", "%.dtx$", "%.ins$", "%.ltx$", "%.tex$", "%.sty$" },
@@ -294,7 +307,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.ps1$" },
 	},
 	prolog = {
-		ext = { "%.prolog$" },
+		ext = { "%.pl$", "%.pro$", "%.prolog$" },
 	},
 	props = {
 		ext = { "%.props$", "%.properties$" },

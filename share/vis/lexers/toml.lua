@@ -8,8 +8,6 @@ local P, R, S = lpeg.P, lpeg.R, lpeg.S
 local M = {_NAME = 'toml'}
 
 -- Whitespace
-local indent = #l.starts_line(S(' \t')) *
-               (token(l.WHITESPACE, ' ') + token('indent_error', '\t'))^1
 local ws = token(l.WHITESPACE, S(' \t')^1 + l.newline^1)
 
 -- Comments.
@@ -44,10 +42,9 @@ local keyword = token(l.KEYWORD, word_match{
 local identifier = token(l.IDENTIFIER, l.word)
 
 -- Operators.
-local operator = token(l.OPERATOR, S('#=+-,.{}[]()'))
+local operator = token(l.OPERATOR, S('=+-,.{}[]()'))
 
 M._rules = {
-  {'indent', indent},
   {'whitespace', ws},
   {'keyword', keyword},
   {'identifier', identifier},
@@ -59,7 +56,6 @@ M._rules = {
 }
 
 M._tokenstyles = {
-  indent_error = 'back:red',
   timestamp = l.STYLE_NUMBER,
 }
 

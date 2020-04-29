@@ -8,7 +8,7 @@ local P, R, S = lpeg.P, lpeg.R, lpeg.S
 local M = {_NAME = 'markdown'}
 
 -- Whitespace.
-local ws = token(l.WHITESPACE, l.space^1)
+local ws = token(l.WHITESPACE, S(' \t')^1 + S('\v\r\n')^1)
 
 -- Block elements.
 local header = token('h6', l.starts_line('######') * l.nonnewline^0) +
@@ -68,10 +68,10 @@ local list = token('list',
 
 M._rules = {
   {'header', header},
+  {'list', list},
   {'blockquote', blockquote},
   {'blockcode', blockcode},
   {'hr', hr},
-  {'list', list},
   {'whitespace', ws},
   {'link_label', link_label},
   {'escape', escape},
