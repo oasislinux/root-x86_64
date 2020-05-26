@@ -1,5 +1,326 @@
 NetSurf:NetSurf
-NetSurfCopyright:© 2003-2019 The NetSurf Developers
+NetSurfCopyright:© 2003-2020 The NetSurf Developers
+Yes:Yes
+No:No
+Replace:Replace file
+DontReplace:Don't replace
+Remove:Remove address
+DontRemove:Don't remove
+obj:object
+objs:objects
+styl:stylesheet
+styls:stylesheets
+OK:OK
+Selecting:Selecting
+FrameDrag:Resizing frames
+Bytes: B
+kBytes: kB
+MBytes: MB
+GBytes: GB
+KiBytes: KiB
+MiBytes: MiB
+GiBytes: GiB
+TiBytes: TiB
+PiBytes: PiB
+EiBytes: EiB
+Form_Submit:Submit
+Form_Reset:Reset
+Form_None:
+Form_Many:(Many)
+Form_Drop:Drop file here
+Form_Drop:Click to select file
+Form_Drop:Drop file here
+Form_Drop:Click or drop file here
+Form_Drop:Drop file here
+Form_Drop:Click to select file
+Form_Drop:Click to select file
+FormSelect:Click to choose a form item
+FormCheckbox:Click to check this option
+FormRadio:Click to choose this option
+FormSubmit:Send form to %s
+FormBadSubmit:Warning: form can not be submitted
+FormButton:Warning: button can not be activated
+FormTextarea:Click to edit the text
+FormTextbox:Click to edit this field
+FormReset:Reset form (not implemented)
+FormFile:Drop a file here to upload it
+SelectMenu:Select
+BMPTitle:%s (BMP image %lux%lu pixels)
+GIFTitle:%s (GIF image %lux%lu pixels)
+ICOTitle:%s (ICO image %lux%lu pixels)
+JPEGTitle:%s (JPEG image %lux%lu pixels)
+PNGTitle:%s (PNG image %lux%lu pixels)
+SpriteTitle:%s (Sprite image %lux%lu pixels)
+WebPTitle:%s (WebP image %lux%lu pixels)
+ArtWorksTitle:%s (ArtWorks image %lux%lu pixels)
+DrawTitle:%s (Draw image %lux%lu pixels)
+DataTypesTitle:%s (%s image %lux%lu pixels)
+Encoding0:from HTTP headers
+Encoding1:detected
+Encoding2:from <meta>
+EncodingUnk:Unknown
+Not2xx:Server returned an error
+InvalidURL:The address <em>%s</em> could not be understood.
+ErrorPage:<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Page error</title></head><body><h1>Sorry, NetSurf was unable to display this page</h1><p><strong>%s</strong></p></body></html>
+NoMemory:NetSurf is running out of memory. Please free some memory and try again.
+SaveError:The file could not be saved due to an error:
+LoadError:The file could not be loaded due to an error:
+MiscError:An unexpected error occurred:
+FileError:File does not exist:
+PrintError:An error occurred when printing:
+NoDiscSpace:Not enough space available on disc.
+HotlistSaveError:The hotlist was unable to be correctly saved.
+TreeLoadError:The tree was unable to be correctly loaded.
+NoDirError:%s is not a directory
+NoNameError:Please enter a name
+NoURLError:Please enter a URL
+URIError:NetSurf was unable to parse this URI file due to a syntax error.
+EmptyError:file is empty.
+SearchError:Invalid Search.
+EncNotRec:Encoding type not recognised.
+FileOpenError:could not open file '%s'
+DirectoryError:directory '%s' already exists
+Timeout:This site took too long to respond
+BadURL:The given URL was not able to be parsed
+PathToURL:An error occurred converting the file path to an URL:
+WimpError:An unexpected Window Manager error occurred:
+DragError:An error occurred when dragging the icon:
+MenuError:An error occurred when opening the menu:
+DownloadWarn:This download may not complete:
+LongURL:The URL for this page is too long for NetSurf to display.
+FontBadInst:An error occurred when initialising fonts due to the presence of obsolete copies of the ROM fonts on disc. NetSurf will exit and launch a program which will attempt to fix this.
+FontError:Failed to open font "Homerton.Medium" (%s).
+Resolvers:No domain name servers are configured, so only browsing local files will be possible. Use Configure to set your name server(s).
+Template:A window template is missing from the Templates file. Please reinstall NetSurf.
+NoPathError:To save, drag the icon to a directory display
+AWNotSeen:Please locate the AWViewer application and try again.
+PrintErrorRO2:It appears that the printer is busy.
+SprIsNull:Unable to convert image to sprite
+CompError:Unable to open
+BMConvErr:NetSurf requires guigfx.library to display images in this mode
+MultiTabClose:Are you sure you want to close multiple tabs?
+TCPIPShutdown:The TCP/IP stack has signalled that it is about to shutdown and NetSurf must exit.  NetSurf will quit in 5 seconds unless this shutdown is aborted.
+AbortShutdown:Abort shutdown
+AbortDownload:Are you sure you wish to abort this download?
+QuitDownload:One or more downloads are still in progress. Are you sure you wish to quit?
+OverwriteFile:A file with that name already exists and would be lost.
+RemoveHotlist:Are you sure you wish to remove this address from the hotlist?
+Progress:%s of %s
+ProgressU:%s
+RecPercent:Received %s (%u%%)
+Received:Received %s
+Redirecting:Redirecting...
+Loading:Loading
+Fetching:Fetching data
+Processing:Processing
+Formatting:Formatting
+Done:Done
+Stopped:Stopped
+BadRedirect:Bad redirect URL
+FetchFailed:Unable to fetch document
+NotCSS:Warning: stylesheet is not CSS
+NotFavIco:Favicon not supported
+BadObject:Warning: bad object type
+ObjError:Error loading object: %s
+ParsingFail:Parsing the document failed.
+CSSGeneric:Error processing CSS
+CSSBase:Base stylesheet failed to load
+BadGIF:Reading GIF failed.
+BadBMP:Reading BMP failed.
+BadICO:Reading ICO failed.
+PNGError:Error converting PNG.
+MNGError:Error converting MNG/PNG/JNG: %i
+BadSprite:Invalid or corrupt Sprite data.
+HTTP0:OK
+HTTP200:OK
+HTTP201:Created
+HTTP202:Accepted
+HTTP203:Non-authoritative information
+HTTP204:No content
+HTTP205:Reset content
+HTTP206:Partial content
+HTTP300:Multiple choices
+HTTP301:Moved permanently
+HTTP302:Found
+HTTP303:See other
+HTTP304:Not modified
+HTTP305:Use proxy
+HTTP307:Temporary redirect
+HTTP400:Bad request
+HTTP401:Unauthorized
+HTTP402:Payment required
+HTTP403:Forbidden
+HTTP404:Not found
+HTTP405:Method not allowed
+HTTP406:Not acceptable
+HTTP407:Proxy authentication required
+HTTP408:Request timeout
+HTTP409:Conflict
+HTTP410:Gone
+HTTP411:Length required
+HTTP412:Precondition failed
+HTTP413:Request entity too large
+HTTP414:Request-URI too long
+HTTP415:Unsupported media type
+HTTP416:Requested range not satisfiable
+HTTP417:Expectation failed
+HTTP500:Internal server error
+HTTP501:Not implemented
+HTTP502:Bad gateway
+HTTP503:Service unavailable
+HTTP504:Gateway timeout
+HTTP505:HTTP version not supported
+FileIndex:Index of %s
+FileParent:^ Up to parent directory
+FileDirectory:Directory
+FileName:Name
+FileSize:Size
+FileDate:Date
+FileTime:Time
+FileType:Type
+NotFound:Not found
+Next:Next
+Prev:Previous
+ShowAll:Show All
+CaseSens:Case Sensitive
+LoginTitle:Authentication Requested
+LoginDescription:The site %s with realm "%s" is requesting credentials for access.
+LoginAgain:The credentials for the site %s and realm "%s" were rejected.
+Host:Host
+Realm:Realm
+Username:Username
+Password:Password
+Login:Login
+Cancel:Cancel
+PrivacyTitle:Privacy error
+PrivacyDescription:A privacy error occurred while communicating with %s this may be a site configuration error or an attempt to steal private information (passwords, messages or credit cards)
+ViewCertificates:View certificate details
+ViewCertificatesNotPossible:Certificate information is not available for viewing
+Proceed:Proceed
+Backtosafety:Back to safety
+SSLCertErrOk:The certificate has no errors.
+SSLCertErrUnknown:An unknown error occurred while processing the certificate.
+SSLCertErrBadIssuer:The issuer of this certificate is not known. This may occur if the browser cannot access the certificate authority (CA) bundle.
+SSLCertErrBadSig:The certificate is improperly signed.
+SSLCertErrTooYoung:The certificate is not yet valid.
+SSLCertErrTooOld:The certificate has expired.
+SSLCertErrSelfSigned:The certificate is self signed.
+SSLCertErrChainSelfSigned:The certificate chain is self signed.
+SSLCertErrRevoked:The certificate has been revoked by the issuer.
+SSLCertErrHostnameMismatch:The certificate is for a different host than the server.
+SSLCertErrCertMissing:The certificate was missing from the chain.
+TimeoutTitle:Connection timed out
+TimeoutDescription: A connection to %s could not be established. The site may be temporarily unavailable or too busy to respond.
+Backtoprevious:Back
+TryAgain:Try Again
+FetchErrorTitle:Error occurred fetching page
+FetchErrorDescription:An error occurred when connecting to %s
+FetchFailedToFinish:The fetcher for this request failed to complete
+SSLCerts:SSL certificates
+SSLError:NetSurf failed to verify the authenticity of an SSL certificate. Please verify the details presented below.
+SSL_Certificate_Subject:Subject: %s
+SSL_Certificate_Issuer:Issuer: %s
+SSL_Certificate_Version:Version: %ld
+SSL_Certificate_ValidFrom:Valid from: %s
+SSL_Certificate_ValidTo:Valid until: %s
+SSL_Certificate_Type:Type: %i
+SSL_Certificate_Serial:Serial: %ld
+SSL_Certificate_Accept:Accept
+SSL_Certificate_Reject:Reject
+PrintSheetFilled:sheet is filled
+PrintSheetsFilled:sheets are filled
+Printer:Printer
+Copies:Copies
+Printing:Printing page
+TreeAdded:Added: %s
+TreeLast:Last visited: %s
+TreeVisited:Visited: %s
+TreeVisits:Visits: %i
+TreeUnknown:Unknown
+TreeValue:Value: %s
+TreeComment:Comment: %s
+TreeDomain:Domain: %s%s
+TreePath:Path: %s%s
+TreeExpires:Expires: %s
+TreeLastUsed:Last used: %s
+TreeSecure:Secure hosts only: %s
+TreeVersion:Version: %s
+TreePersistent:Persistent: %s
+TreeHeaders: (from headers)
+TreeVersion0:Netscape
+TreeVersion1:RFC 2109
+TreeVersion2:RFC 2965
+TreeSession:Session end
+TreeUnused:Unused
+TreeImport:Imported URL
+TreeNewLink:New address
+TreeNewFolder:New directory
+TreeLaunch:Visit URL
+TreeDelete:Delete
+TreeDefault:Set as default
+TreeClear:Clear default
+TreeEdit:Edit title
+TreeviewLabelTitle:Title
+TreeviewLabelURL:URL
+TreeviewLabelLastVisit:Last visit
+TreeviewLabelVisits:Visits
+TreeviewLabelPeriod:Period
+TreeviewLabelName:Name
+TreeviewLabelContent:Content
+TreeviewLabelDomain:Domain
+TreeviewLabelPath:Path
+TreeviewLabelExpires:Expires
+TreeviewLabelLastUsed:Last used
+TreeviewLabelRestrictions:Restrictions
+TreeviewLabelVersion:Version
+TreeviewLabelPersistent:Persistent
+TreeviewLabelDomainFolder:Domain folder
+TreeviewLabelSerial:Serial
+TreeviewLabelType:Type
+TreeviewLabelValidUntil:Valid until
+TreeviewLabelValidFrom:Valid from
+TreeviewLabelIssuer:Issuer
+TreeviewLabelFolder:Folder
+CookieManagerSession:Session
+CookieManagerHTTPS:Secure hosts via https only
+CookieManagerSecure:Secure hosts only
+CookieManagerHTTP:HTTP connections only
+HotlistDefaultFolderName:Unsorted entries
+NewFolderName:New folder
+NoTitle:<No title>
+TreeHotlist:NetSurf hotlist
+NetSurfDesc:Small as a mouse, fast as a cheetah and available for free. NetSurf is a multi-platform web browser.
+AboutDesc:NetSurf is a small and fast web browser.
+NewLink:Create new address
+NewFolder:Create new directory
+EditTitle:Edit title
+EditLink:Edit address
+EditFolder:Rename directory
+HotlistHomepage:NetSurf homepage
+HotlistDocumentation:Documentation
+HotlistContact:Contact the NetSurf developers
+HotlistDownloads:Download the latest version
+HotlistMenu:Hotlist menu
+HotlistToolbar:Hotlist toolbar
+GlobalHistory:Global history
+DomainAll:(All domains)
+DateToday:Today
+DateYesterday:Yesterday
+Date2Days:Two days ago
+Date3Days:Three days ago
+Date4Days:Four days ago
+Date5Days:Five days ago
+Date6Days:Six days ago
+Date1Week:A week ago
+Date2Week:Two weeks ago
+Date3Week:Three weeks ago
+Sunday:Sunday
+Monday:Monday
+Tuesday:Tuesday
+Wednesday:Wednesday
+Thursday:Thursday
+Friday:Friday
+Saturday:Saturday
 Info:Info
 AppHelpNoShortcut:Help...
 AppHelp:Help...
@@ -182,95 +503,6 @@ FrameNewTab:Show in new tab
 FrameOnly:Show only this frame
 SelectFile:Select file...
 ExternalApp:Open in external application
-TreeAdded:Added: %s
-TreeLast:Last visited: %s
-TreeVisited:Visited: %s
-TreeVisits:Visits: %i
-TreeUnknown:Unknown
-TreeValue:Value: %s
-TreeComment:Comment: %s
-TreeDomain:Domain: %s%s
-TreePath:Path: %s%s
-TreeExpires:Expires: %s
-TreeLastUsed:Last used: %s
-TreeSecure:Secure hosts only: %s
-TreeVersion:Version: %s
-TreePersistent:Persistent: %s
-TreeHeaders: (from headers)
-TreeVersion0:Netscape
-TreeVersion1:RFC 2109
-TreeVersion2:RFC 2965
-TreeSession:Session end
-TreeUnused:Unused
-TreeImport:Imported URL
-TreeNewLink:New address
-TreeNewFolder:New directory
-TreeLaunch:Visit URL
-TreeDelete:Delete
-TreeDefault:Set as default
-TreeClear:Clear default
-TreeEdit:Edit title
-TreeviewLabelTitle:Title
-TreeviewLabelURL:URL
-TreeviewLabelLastVisit:Last visit
-TreeviewLabelVisits:Visits
-TreeviewLabelPeriod:Period
-TreeviewLabelName:Name
-TreeviewLabelContent:Content
-TreeviewLabelDomain:Domain
-TreeviewLabelPath:Path
-TreeviewLabelExpires:Expires
-TreeviewLabelLastUsed:Last used
-TreeviewLabelRestrictions:Restrictions
-TreeviewLabelVersion:Version
-TreeviewLabelPersistent:Persistent
-TreeviewLabelDomainFolder:Domain folder
-TreeviewLabelSerial:Serial
-TreeviewLabelType:Type
-TreeviewLabelValidUntil:Valid until
-TreeviewLabelValidFrom:Valid from
-TreeviewLabelIssuer:Issuer
-TreeviewLabelFolder:Folder
-CookieManagerSession:Session
-CookieManagerHTTPS:Secure hosts via https only
-CookieManagerSecure:Secure hosts only
-CookieManagerHTTP:HTTP connections only
-HotlistDefaultFolderName:Unsorted entries
-NewFolderName:New folder
-NoTitle:<No title>
-TreeHotlist:NetSurf hotlist
-NetSurfDesc:Small as a mouse, fast as a cheetah and available for free. NetSurf is a multi-platform web browser.
-AboutDesc:NetSurf is a small and fast web browser.
-NewLink:Create new address
-NewFolder:Create new directory
-EditTitle:Edit title
-EditLink:Edit address
-EditFolder:Rename directory
-HotlistHomepage:NetSurf homepage
-HotlistDocumentation:Documentation
-HotlistContact:Contact the NetSurf developers
-HotlistDownloads:Download the latest version
-HotlistMenu:Hotlist menu
-HotlistToolbar:Hotlist toolbar
-GlobalHistory:Global history
-DomainAll:(All domains)
-DateToday:Today
-DateYesterday:Yesterday
-Date2Days:Two days ago
-Date3Days:Three days ago
-Date4Days:Four days ago
-Date5Days:Five days ago
-Date6Days:Six days ago
-Date1Week:A week ago
-Date2Week:Two weeks ago
-Date3Week:Three weeks ago
-Sunday:Sunday
-Monday:Monday
-Tuesday:Tuesday
-Wednesday:Wednesday
-Thursday:Thursday
-Friday:Friday
-Saturday:Saturday
 Download:%s of %s  •  %s/s  •  %s remaining
 DownloadU:%s of unknown  •  %s/s  •  %s total
 Downloaded:%s complete  •  average %s/s  •  %s total
@@ -307,12 +539,13 @@ gtkSave:Save file as…
 gtkSourceSave:Save source
 gtkSourceTabError:Error handling source data 
 gtkplainSave:Save plain text
-gtkcompleteSave:Save webpage complete - select an empty directory
+gtkcompleteSave:Export complete page as a folder
 gtkSaveConfirm:File saved
 gtkSaveCancelled:File not saved
 gtkUnknownHost:an unknown host
 gtkUnknownFile:
 gtkUnknownSize:unknown
+gtkOpenMenu:Open Menu
 gtkFile:_File
 gtkEdit:_Edit
 gtkView:_View
@@ -323,8 +556,8 @@ gtkNewTab:New _Tab
 gtkNewWindow:_New Window
 gtkOpenFile:_Open File
 gtkCloseWindow:_Close Window
-gtkSavePage:Save Page…
 gtkExport:Export
+gtkSavePage:Complete Page…
 gtkPlainText:Plain Text…
 gtkDrawFile:Drawfile…
 gtkPostScript:PostScript…
@@ -361,6 +594,7 @@ gtkDeveloper:De_veloper
 gtkToggleDebugging:T_oggle debug rendering
 gtkDebugBoxTree:Debug _box tree
 gtkDebugDomTree:Debug _DOM tree
+gtkStop:Stop
 gtkBack:_Back
 gtkForward:_Forward
 gtkHome:_Home
@@ -383,12 +617,19 @@ gtkOpenwin:Open Link in New _Window
 gtkSavelink:Save Lin_k
 gtkBookmarklink:Bookmark _Link
 gtkCopylink:Copy link loc_ation
-gtkToolBarTitle:Toolbar custom button store
 gtkAddThemeTitle:Select folder containing theme images
 gtkThemeFolderInstructions:To Install a theme, create a directory full of appropriately-named images as a subdirectory of gtk/res/themes/
 gtkThemeFolderSub:Select a subdirectory of the themes folder
 gtkThemeDup:Theme is already included
 gtkThemeAdd:Theme added successfully
+gtkCustomizeToolbarTitle:Customise Toolbar
+gtkCustomizeToolbarInstructions:Drag toolbar items into and out of the toolbar.
+gtkFindPlaceholder:Find in page
+gtkFindBack:Find Previous Occurrence
+gtkFindForward:Find _Next Occurrence
+gtkFindHighlightAll:Highlight All
+gtkFindMatchCase:Match Case
+gtkFindClose:Close Find Bar
 preferencesTitle:Netsurf Preferences
 preferencesMainTabtitle:Main
 preferencesStartup:<b>Startup</b>
@@ -509,194 +750,6 @@ preferencesMarginsMeasurements:measurements in mm
 preferencesGeneration:<b>Generation</b>
 preferencesGenerationCompressed:Output is compressed
 preferencesGenerationPassword:Output has a password
-PrintSheetFilled:sheet is filled
-PrintSheetsFilled:sheets are filled
-Printer:Printer
-Copies:Copies
-Printing:Printing page
-NotFound:Not found
-Next:Next
-Prev:Previous
-ShowAll:Show All
-CaseSens:Case Sensitive
-LoginDescription:The site %s with realm "%s" is requesting credentials for access.
-LoginAgain:The credentials for the site %s and realm "%s" were rejected.
-LoginLabel:A website is requesting credentials for access.
-Host:Host
-Realm:Realm
-Username:Username
-Password:Password
-Login:Login
-Cancel:Cancel
-SSLCerts:SSL certificates
-SSLError:NetSurf failed to verify the authenticity of an SSL certificate. Please verify the details presented below.
-SSL_Certificate_Subject:Subject: %s
-SSL_Certificate_Issuer:Issuer: %s
-SSL_Certificate_Version:Version: %ld
-SSL_Certificate_ValidFrom:Valid from: %s
-SSL_Certificate_ValidTo:Valid until: %s
-SSL_Certificate_Type:Type: %i
-SSL_Certificate_Serial:Serial: %ld
-SSL_Certificate_Accept:Accept
-SSL_Certificate_Reject:Reject
-Form_Submit:Submit
-Form_Reset:Reset
-Form_None:
-Form_Many:(Many)
-Form_Drop:Drop file here
-Form_Drop:Click to select file
-Form_Drop:Drop file here
-Form_Drop:Click or drop file here
-Form_Drop:Drop file here
-Form_Drop:Click to select file
-Form_Drop:Click to select file
-FormSelect:Click to choose a form item
-FormCheckbox:Click to check this option
-FormRadio:Click to choose this option
-FormSubmit:Send form to %s
-FormBadSubmit:Warning: form can not be submitted
-FormButton:Warning: button can not be activated
-FormTextarea:Click to edit the text
-FormTextbox:Click to edit this field
-FormReset:Reset form (not implemented)
-FormFile:Drop a file here to upload it
-SelectMenu:Select
-DrawTitle:%s (Draw image %lux%lu pixels)
-GIFTitle:%s (GIF image %lux%lu pixels)
-BMPTitle:%s (BMP image %lux%lu pixels)
-ICOTitle:%s (ICO image %lux%lu pixels)
-JPEGTitle:%s (JPEG image %lux%lu pixels)
-PNGTitle:%s (PNG image %lux%lu pixels)
-JNGTitle:%s (JNG image %lux%lu pixels)
-MNGTitle:%s (MNG image %lux%lu pixels)
-WebPTitle:%s (WebP image %lux%lu pixels)
-SpriteTitle:%s (Sprite image %lux%lu pixels)
-ArtWorksTitle:%s (ArtWorks image %lux%lu pixels)
-DataTypesTitle:%s (%s image %lux%lu pixels)
-Encoding0:from HTTP headers
-Encoding1:detected
-Encoding2:from <meta>
-EncodingUnk:Unknown
-FileIndex:Index of %s
-FileParent:^ Up to parent directory
-FileDirectory:Directory
-FileName:Name
-FileSize:Size
-FileDate:Date
-FileTime:Time
-FileType:Type
-Selecting:Selecting
-FrameDrag:Resizing frames
-Not2xx:Server returned an error
-InvalidURL:The address <em>%s</em> could not be understood.
-ErrorPage:<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Page error</title></head><body><h1>Sorry, NetSurf was unable to display this page</h1><p><strong>%s</strong></p></body></html>
-PathToURL:An error occurred converting the file path to an URL:
-SaveError:The file could not be saved due to an error:
-LoadError:The file could not be loaded due to an error:
-MenuError:An error occurred when opening the menu:
-DragError:An error occurred when dragging the icon:
-TbarError:An error occurred when constructing the toolbar:
-WimpError:An unexpected Window Manager error occurred:
-DownloadWarn:This download may not complete:
-MiscError:An unexpected error occurred:
-FileError:File does not exist:
-PrintError:An error occurred when printing:
-NoMemory:NetSurf is running out of memory. Please free some memory and try again.
-LongURL:The URL for this page is too long for NetSurf to display.
-FontBadInst:An error occurred when initialising fonts due to the presence of obsolete copies of the ROM fonts on disc. NetSurf will exit and launch a program which will attempt to fix this.
-FontError:Failed to open font "Homerton.Medium" (%s).
-Resolvers:No domain name servers are configured, so only browsing local files will be possible. Use Configure to set your name server(s).
-NoDiscSpace:Not enough space available on disc.
-Template:A window template is missing from the Templates file. Please reinstall NetSurf.
-HotlistSaveError:The hotlist was unable to be correctly saved.
-TreeLoadError:The tree was unable to be correctly loaded.
-NoDirError:%s is not a directory
-NoPathError:To save, drag the icon to a directory display
-NoNameError:Please enter a name
-NoURLError:Please enter a URL
-URIError:NetSurf was unable to parse this URI file due to a syntax error.
-EmptyError:file is empty.
-SearchError:Invalid Search.
-PrintErrorRO2:It appears that the printer is busy.
-AWNotSeen:Please locate the AWViewer application and try again.
-EncNotRec:Encoding type not recognised.
-FileOpenError:could not open file '%s'
-DirectoryError:directory '%s' already exists
-SprIsNull:Unable to convert image to sprite
-CompError:Unable to open
-BMConvErr:NetSurf requires guigfx.library to display images in this mode
-MultiTabClose:Are you sure you want to close multiple tabs?
-TCPIPShutdown:The TCP/IP stack has signalled that it is about to shutdown and NetSurf must exit.  NetSurf will quit in 5 seconds unless this shutdown is aborted.
-AbortShutdown:Abort shutdown
-AbortDownload:Are you sure you wish to abort this download?
-QuitDownload:One or more downloads are still in progress. Are you sure you wish to quit?
-OverwriteFile:A file with that name already exists and would be lost.
-RemoveHotlist:Are you sure you wish to remove this address from the hotlist?
-Progress:%s of %s
-ProgressU:%s
-RecPercent:Received %s (%u%%)
-Received:Received %s
-Redirecting:Redirecting...
-Loading:Loading
-Fetching:Fetching data
-Processing:Processing
-Formatting:Formatting
-Done:Done
-Stopped:Stopped
-BadRedirect:Bad redirect URL
-FetchFailed:Unable to fetch document
-NotCSS:Warning: stylesheet is not CSS
-NotFavIco:Favicon not supported
-BadObject:Warning: bad object type
-ObjError:Error loading object: %s
-ParsingFail:Parsing the document failed.
-CSSGeneric:Error processing CSS
-CSSBase:Base stylesheet failed to load
-BadGIF:Reading GIF failed.
-BadBMP:Reading BMP failed.
-BadICO:Reading ICO failed.
-PNGError:Error converting PNG.
-MNGError:Error converting MNG/PNG/JNG: %i
-BadSprite:Invalid or corrupt Sprite data.
-HTTP0:OK
-HTTP200:OK
-HTTP201:Created
-HTTP202:Accepted
-HTTP203:Non-authoritative information
-HTTP204:No content
-HTTP205:Reset content
-HTTP206:Partial content
-HTTP300:Multiple choices
-HTTP301:Moved permanently
-HTTP302:Found
-HTTP303:See other
-HTTP304:Not modified
-HTTP305:Use proxy
-HTTP307:Temporary redirect
-HTTP400:Bad request
-HTTP401:Unauthorized
-HTTP402:Payment required
-HTTP403:Forbidden
-HTTP404:Not found
-HTTP405:Method not allowed
-HTTP406:Not acceptable
-HTTP407:Proxy authentication required
-HTTP408:Request timeout
-HTTP409:Conflict
-HTTP410:Gone
-HTTP411:Length required
-HTTP412:Precondition failed
-HTTP413:Request entity too large
-HTTP414:Request-URI too long
-HTTP415:Unsupported media type
-HTTP416:Requested range not satisfiable
-HTTP417:Expectation failed
-HTTP500:Internal server error
-HTTP501:Not implemented
-HTTP502:Bad gateway
-HTTP503:Service unavailable
-HTTP504:Gateway timeout
-HTTP505:HTTP version not supported
 ScrollUp:Click the arrow to scroll up
 ScrollPUp:Click to scroll up one page
 ScrollV:Drag the bar to scroll vertically
@@ -723,21 +776,6 @@ ThemeInvalid:The downloaded theme is invalid or requires a newer version of NetS
 ThemeInstall:Would you like to install the theme '%s' by %s?
 ThemeInstallErr:An error occurred whilst trying to install the downloaded theme.
 ThemeApplyErr:An error occurred whilst trying to apply the downloaded theme.
-Bytes: B
-kBytes: kB
-MBytes: MB
-GBytes: GB
-Yes:Yes
-No:No
-Replace:Replace file
-DontReplace:Don't replace
-Remove:Remove address
-DontRemove:Don't remove
-obj:object
-objs:objects
-styl:stylesheet
-styls:stylesheets
-OK:OK
 More:More
 HelpToolbar0:\Tback button.|M\Straverse back one page in the history tree.|MDoes not resubmit form information.
 HelpToolbar1:\Tforward button.|M\Straverse forward one page in the history tree.|MDoes not resubmit form information.
@@ -1090,6 +1128,12 @@ HelpToolbarHome:Home\nLMB: Goes to the homepage
 HelpToolbarURL:URL bar\nType a URL and press Return\nSuggestions can be selected with up/down
 HelpToolbarWebSearch:Web search bar\nType text and press Return to search using your default search provider
 HelpToolbarAddTab:Add tab\nLMB: Adds a new blank tab
+PageInfo:Page info
+PageInfoInsecure:Insecure
+PageInfoLocal:Local
+PageInfoSecure:Secure
+PageInfoWarning:Warning
+PageInfoInternal:Internal
 con_cache:Cache
 con_connect:Connection
 con_content:Content
@@ -1212,10 +1256,3 @@ RemoveBackground:Remove background
 FitPage:Fit page
 CompressPDF:Compress PDF
 SetPassword:Set password
-TreeHistory:NetSurf history
-SaveSelect:Save
-ExportAs:Export as
-AnimImg:Animations
-DitherImg:Dither images
-FilterImg:Smooth images
-RenderText:Blend text to background
