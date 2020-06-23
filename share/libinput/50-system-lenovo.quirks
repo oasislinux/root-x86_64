@@ -169,6 +169,11 @@ MatchName=AT Translated Set 2 keyboard
 MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkPadX200Tablet:*
 ModelTabletModeNoSuspend=1
 
+[Lenovo X201 Tablet]
+MatchName=At Translated Set 2 keyboard
+MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkPadX201Tablet:*
+ModelTabletModeNoSuspend=1
+
 # Lenovo MIIX 720 comes with a detachable keyboard. We must not disable
 # the keyboard because some keys are still accessible on the screen and
 # volume rocker. See

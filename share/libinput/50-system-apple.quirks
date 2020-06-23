@@ -37,12 +37,32 @@ MatchVendor=0x05AC
 MatchProduct=0x030D
 AttrEventCodeDisable=EV_ABS
 
+# The External Apple "Magic" trackpads, both the 1st and 2nd generations, have
+# pretty good built-in spurious touch filtering in the device firmware. Using
+# low enough values such as 20:10 effectively disables libinput's filtering.
 [Apple Magic Trackpad v1 (2010, clickpad)]
 MatchUdevType=touchpad
 MatchBus=bluetooth
 MatchVendor=0x5AC
 MatchProduct=0x030E
 AttrSizeHint=130x110
+AttrTouchSizeRange=20:10
+AttrPalmSizeThreshold=900
+AttrThumbSizeThreshold=700
+
+# 2nd generation trackpad can be connected over Bluetooth as well as USB.
+[Apple Magic Trackpad v2 (2015)]
+MatchVendor=0x05AC
+MatchProduct=0x0265
+AttrSizeHint=162x115
+AttrTouchSizeRange=20:10
+AttrPalmSizeThreshold=900
+AttrThumbSizeThreshold=700
+
+[Apple Magic Trackpad v2 (new vendor ID)]
+MatchVendor=0x004C
+MatchProduct=0x0265
+AttrSizeHint=162x115
 AttrTouchSizeRange=20:10
 AttrPalmSizeThreshold=900
 AttrThumbSizeThreshold=700

@@ -24,6 +24,16 @@ MatchName=SYN1EDE:00 06CB:7442
 MatchDMIModalias=dmi:*svnHewlett-Packard:pnHPStreamNotebookPC11*
 ModelHPStream11Touchpad=1
 
+# The HP stream x360's embedded-controller filters out events form its builtin
+# keyboard when in tablet-mode itself; and it has a capacitive home-button
+# (windows logo) underneath its display which also sends PS/2 key-events.
+# Do not suspend the keyboard when in tablet-mode so that the home button
+# keeps working when in tablet-mode.
+[HP Stream x360 11]
+MatchName=AT Translated Set 2 keyboard
+MatchDMIModalias=dmi:*:svnHewlett-Packard:pnHPStreamx360ConvertiblePC11:*
+ModelTabletModeNoSuspend=1
+
 [HP ZBook Studio G3]
 MatchName=AlpsPS/2 ALPS GlidePoint
 MatchDMIModalias=dmi:*svnHP:pnHPZBookStudioG3:*
