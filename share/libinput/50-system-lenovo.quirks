@@ -134,8 +134,9 @@ AttrTrackpointMultiplier=1.25
 # sends bogus ABS_MT_TOOL_TYPE events for MT_TOOL_PALM
 [Lenovo Carbon X1 6th gen]
 MatchName=Synaptics TM3288-011
-MatchDMIModalias=dmi:*svnLenovo:*pvrThinkPadX1Carbon6th:*
+MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkPadX1Carbon6th:*
 AttrEventCodeDisable=ABS_MT_TOOL_TYPE
+ModelLenovoX1Gen6Touchpad=1
 
 [Lenovo X41 Tablet]
 MatchName=AT Translated Set 2 keyboard
@@ -181,4 +182,12 @@ ModelTabletModeNoSuspend=1
 [Lenovo MIIX 720]
 MatchName=AT Raw Set 2 keyboard
 MatchDMIModalias=dmi:*svnLENOVO:*pvrLenovoMIIX720-12IKB:*
+ModelTabletModeNoSuspend=1
+
+# Lenovo ThinkPad X1 Tablet (1st Gen) also comes with a detachable keyboard.
+# We must not disable the keyboard because some keys are still accessible on
+# volume rocker.
+[Lenovo ThinkPad X1 Tablet (1st Gen)]
+MatchName=AT Raw Set 2 keyboard
+MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkPadX1Tablet:*
 ModelTabletModeNoSuspend=1
