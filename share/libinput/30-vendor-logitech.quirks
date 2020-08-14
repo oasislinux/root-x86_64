@@ -46,6 +46,33 @@ MatchVendor=0x046D
 MatchProduct=0x4011
 AttrPalmPressureThreshold=400
 
+[Logitech MX Master]
+MatchVendor=0x46D
+MatchProduct=0x4041
+ModelInvertHorizontalScrolling=1
+[Logitech MX Master]
+MatchVendor=0x46D
+MatchProduct=0x4060
+ModelInvertHorizontalScrolling=1
+[Logitech MX Master]
+MatchVendor=0x46D
+MatchProduct=0x4071
+ModelInvertHorizontalScrolling=1
+
+# MX Master has a different PID on bluetooth
+[Logitech MX Master]
+MatchVendor=0x46D
+MatchProduct=0xB012
+ModelInvertHorizontalScrolling=1
+[Logitech MX Master]
+MatchVendor=0x46D
+MatchProduct=0xB017
+ModelInvertHorizontalScrolling=1
+[Logitech MX Master]
+MatchVendor=0x46D
+MatchProduct=0xB01E
+ModelInvertHorizontalScrolling=1
+
 [Logitech MX Master 2S]
 MatchVendor=0x46D
 MatchProduct=0x4069
