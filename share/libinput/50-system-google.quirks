@@ -86,3 +86,11 @@ MatchUdevType=touchpad
 MatchName=Atmel maXTouch Touchpad
 MatchDMIModalias=dmi:*svn*GOOGLE*:pn*Samus*
 ModelChromebook=1
+
+[Google Chromebook Eve]
+MatchUdevType=touchpad
+MatchName=ACPI0C50:00 18D1:5028
+MatchDMIModalias=dmi:*svnGoogle:pnEve*
+ModelChromebook=1
+AttrPressureRange=6:4
+AttrThumbPressureThreshold=45

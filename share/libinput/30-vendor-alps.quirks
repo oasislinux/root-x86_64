@@ -19,6 +19,12 @@ MatchVendor=0x0002
 MatchProduct=0x0008
 ModelALPSSerialTouchpad=1
 
+[ALPS i2c Touchpads]
+MatchUdevType=touchpad
+MatchBus=i2c
+MatchVendor=0x0488
+AttrPalmPressureThreshold=180
+
 [ALPS v8 Touchpads]
 MatchUdevType=touchpad
 MatchBus=ps2

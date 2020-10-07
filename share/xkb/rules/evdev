@@ -96,6 +96,7 @@
   $azerty       =       +aliases(azerty)
   $qwertz       =       +aliases(qwertz)
   *             =       +aliases(qwerty)
+! option	=	keycodes
 ! model		layout	=	geometry
   thinkpad     us              =       thinkpad(us)
 ! model		=	geometry
@@ -230,6 +231,10 @@
   $applealu	=	complete+numpad(mac)
   $nokiamodels	=	complete+nokia
   *		=	complete
+! layout	option	=	symbols
+  $threelevellayouts	grp:alts_toggle = +level3(ralt_switch_for_alts_toggle)
+  *			misc:typo 	= +typo(base)
+  *			misc:apl	= +apl(level3)
 ! layout[1]	option	=	symbols
   $threelevellayouts	grp:alts_toggle = +level3(ralt_switch_for_alts_toggle):1
   *			misc:typo 	= +typo(base):1
@@ -422,6 +427,7 @@
   shift:lshift_both_shiftlock        =       +shift(lshift_both_shiftlock)
   shift:rshift_both_shiftlock        =       +shift(rshift_both_shiftlock)
   solaris:sun_compat				 =		 +sun_vndr/solaris(sun_compat)
+  lv2:lsgt_switch                    =       +level2(lsgt_switch)
   lv3:caps_switch                    =       +level3(caps_switch)
   lv3:bksl_switch                    =       +level3(bksl_switch)
   lv3:lsgt_switch                    =       +level3(lsgt_switch)

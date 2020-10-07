@@ -57,7 +57,8 @@ MatchProduct=0x0265
 AttrSizeHint=162x115
 AttrTouchSizeRange=20:10
 AttrPalmSizeThreshold=900
-AttrThumbSizeThreshold=700
+AttrThumbSizeThreshold=800
+AttrPalmPressureThreshold=190
 
 [Apple Magic Trackpad v2 (new vendor ID)]
 MatchVendor=0x004C
@@ -65,7 +66,8 @@ MatchProduct=0x0265
 AttrSizeHint=162x115
 AttrTouchSizeRange=20:10
 AttrPalmSizeThreshold=900
-AttrThumbSizeThreshold=700
+AttrThumbSizeThreshold=800
+AttrPalmPressureThreshold=190
 
 [Apple Touchpad OneButton]
 MatchUdevType=touchpad
