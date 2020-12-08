@@ -149,6 +149,10 @@ vis.ftdetect.filetypes = {
 	gap = {
 		ext = { "%.g$", "%.gd$", "%.gi$", "%.gap$" },
 	},
+	gemini = {
+		ext = { "%.gmi" },
+		mime = { "text/gemini" },
+	},
 	gettext = {
 		ext = { "%.po$", "%.pot$" },
 	},
@@ -204,7 +208,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.bsh$", "%.java$" },
 	},
 	javascript = {
-		ext = { "%.js$", "%.jsfl$" },
+		ext = { "%.cjs$", "%.js$", "%.jsfl$", "%.mjs$", "%.ts$" },
 	},
 	json = {
 		ext = { "%.json$" },
@@ -227,7 +231,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.less$" },
 	},
 	lilypond = {
-		ext = { "%.lily$", "%.ly$" },
+		ext = { "%.ily$", "%.ly$" },
 	},
 	lisp = {
 		ext = { "%.cl$", "%.el$", "%.lisp$", "%.lsp$" },
@@ -257,6 +261,9 @@ vis.ftdetect.filetypes = {
 	markdown = {
 		ext = { "%.md$", "%.markdown$" },
 		mime = { "text/x-markdown" },
+	},
+	meson = {
+		ext = { "^meson%.build$" },
 	},
 	moonscript = {
 		ext = { "%.moon$" },
@@ -343,6 +350,12 @@ vis.ftdetect.filetypes = {
 	rhtml = {
 		ext = { "%.erb$", "%.rhtml$" },
 	},
+	routeros = {
+		ext = { "%.rsc" },
+		detect = function(file, data)
+			return data:match("^#.* by RouterOS")
+		end
+	},
 	rstats = {
 		ext = { "%.R$", "%.Rout$", "%.Rhistory$", "%.Rt$", "Rout.save", "Rout.fail" },
 	},
@@ -363,7 +376,7 @@ vis.ftdetect.filetypes = {
 		mime = { "text/x-scala" },
 	},
 	scheme = {
-		ext = { "%.sch$", "%.scm$", "%.sld$", "%.sls$", "%.ss$" },
+		ext = { "%.rkt$", "%.sch$", "%.scm$", "%.sld$", "%.sls$", "%.ss$" },
 	},
 	smalltalk = {
 		ext = { "%.changes$", "%.st$", "%.sources$" },
@@ -403,7 +416,8 @@ vis.ftdetect.filetypes = {
 	},
 	text = {
 		ext = { "%.txt$" },
-		mime = { "text/plain" },
+		-- Do *not* list mime "text/plain" here, it is covered below,
+		-- see 'try text lexer as a last resort'
 	},
 	toml = {
 		ext = { "%.toml$" },
@@ -442,6 +456,9 @@ vis.ftdetect.filetypes = {
 	yaml = {
 		ext = { "%.yaml$", "%.yml$" },
 		mime = { "text/x-yaml" },
+	},
+	zig = {
+		ext = { "%.zig$" },
 	},
 }
 
