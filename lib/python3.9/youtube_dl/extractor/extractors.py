@@ -30,6 +30,8 @@ from .adobetv import (
 from .adultswim import AdultSwimIE
 from .aenetworks import (
     AENetworksIE,
+    AENetworksCollectionIE,
+    AENetworksShowIE,
     HistoryTopicIE,
 )
 from .afreecatv import AfreecaTVIE
@@ -393,6 +395,7 @@ from .frontendmasters import (
     FrontendMastersLessonIE,
     FrontendMastersCourseIE
 )
+from .fujitv import FujiTVFODPlus7IE
 from .funimation import FunimationIE
 from .funk import FunkIE
 from .fusion import FusionIE
@@ -1221,7 +1224,10 @@ from .tv2dk import (
 from .tv2hu import TV2HuIE
 from .tv4 import TV4IE
 from .tv5mondeplus import TV5MondePlusIE
-from .tva import TVAIE
+from .tva import (
+    TVAIE,
+    QubIE,
+)
 from .tvanouvelles import (
     TVANouvellesIE,
     TVANouvellesArticleIE,
@@ -1230,6 +1236,7 @@ from .tvc import (
     TVCIE,
     TVCArticleIE,
 )
+from .tver import TVerIE
 from .tvigle import TvigleIE
 from .tvland import TVLandIE
 from .tvn24 import TVN24IE
@@ -1515,6 +1522,7 @@ from .youtube import (
     YoutubeSubscriptionsIE,
     YoutubeTruncatedIDIE,
     YoutubeTruncatedURLIE,
+    YoutubeYtBeIE,
     YoutubeYtUserIE,
     YoutubeWatchLaterIE,
 )
