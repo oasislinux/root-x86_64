@@ -11,7 +11,19 @@ MatchUdevType=touchpad
 MatchDMIModalias=dmi:*svnDellInc.:*
 AttrMscTimestamp=watch
 
-[Dell Lattitude E6220 Touchpad]
+[Dell Inspiron 15R N5110 Touchpad]
+MatchUdevType=touchpad
+MatchName=*AlpsPS/2 ALPS GlidePoint
+MatchDMIModalias=dmi:*svnDellInc.:*pnInspironN5110*
+AttrPressureRange=100:95
+
+[Dell Latitude E5510 Touchpad]
+MatchUdevType=touchpad
+MatchName=*AlpsPS/2 ALPS GlidePoint
+MatchDMIModalias=dmi:*svnDellInc.:pnLatitudeE5510:*
+AttrPressureRange=100:90
+
+[Dell Latitude E6220 Touchpad]
 MatchName=*AlpsPS/2 ALPS GlidePoint
 MatchDMIModalias=dmi:*svnDellInc.:pnLatitudeE6220:*
 AttrPressureRange=100:90
@@ -27,6 +39,11 @@ MatchName=*Synaptics s3203
 MatchDMIModalias=dmi:*svnDellInc.:*pnXPS139333*
 AttrPressureRange=15:10
 AttrPalmPressureThreshold=150
+
+[Dell XPS 15 9500 Touchpad]
+MatchName=* Touchpad
+MatchDMIModalias=dmi:*svnDellInc.:pnXPS159500:*
+ModelTouchpadVisibleMarker=0
 
 [Dell Latitude D620 Trackpoint]
 MatchName=*DualPoint Stick
@@ -64,6 +81,12 @@ AttrTrackpointMultiplier=1.5
 MatchName=*DualPoint Stick
 MatchDMIModalias=dmi:*svnDellInc.:pnLatitudeE7470*
 AttrTrackpointMultiplier=0.125
+
+[Precision 7x50 Touchpad]
+MatchBus=i2c
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnDellInc.:pnPrecision7?50*
+AttrInputPropDisable=INPUT_PROP_BUTTONPAD
 
 # The touch device has the same vid/pid as the totem, the MatchName
 # directive is required here

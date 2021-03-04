@@ -31,25 +31,31 @@ MatchName=*TPPS/2 IBM TrackPoint
 MatchDMIModalias=dmi:*svnLENOVO:*:pvrThinkPadT480:*
 AttrTrackpointMultiplier=0.4
 
+# Touchpad is a clickpad but INPUT_PROP_BUTTONPAD is not set, see
+# https://gitlab.freedesktop.org/libinput/libinput/issues/177
 [Lenovo T480s Touchpad]
 MatchName=Elan Touchpad
 MatchDMIModalias=dmi:*svnLENOVO:*:pvrThinkPadT480s*
-ModelLenovoT480sTouchpad=1
+AttrInputPropEnable=INPUT_PROP_BUTTONPAD
 
+# Touchpad is a clickpad but INPUT_PROP_BUTTONPAD is not set, see
+# https://gitlab.freedesktop.org/libinput/libinput/issues/177
 [Lenovo T490s Touchpad]
 MatchName=Elan Touchpad
 MatchDMIModalias=dmi:*svnLENOVO:*:pvrThinkPadT490s*
-ModelLenovoT490sTouchpad=1
+AttrInputPropEnable=INPUT_PROP_BUTTONPAD
 
 [Lenovo T490s Trackpoint]
 MatchName=*TPPS/2 IBM TrackPoint
 MatchDMIModalias=dmi:*svnLENOVO:*:pvrThinkPadT490s:*
 AttrTrackpointMultiplier=0.4
 
+# Touchpad is a clickpad but INPUT_PROP_BUTTONPAD is not set, see
+# https://gitlab.freedesktop.org/libinput/libinput/issues/234
 [Lenovo L380 Touchpad]
 MatchName=Elan Touchpad
 MatchDMIModalias=dmi:*svnLENOVO:*:pvrThinkPadL380*
-ModelLenovoL380Touchpad=1
+AttrInputPropEnable=INPUT_PROP_BUTTONPAD
 
 [Lenovo X200 Trackpoint]
 MatchName=*TPPS/2 IBM TrackPoint
@@ -129,6 +135,14 @@ ModelTabletModeNoSuspend=1
 MatchName=*TPPS/2 IBM TrackPoint
 MatchDMIModalias=dmi:*svnLENOVO:*:pvrThinkPadX1Yoga1st:*
 AttrTrackpointMultiplier=1.25
+
+# A true pressurepad so let's not use pressure for contact size
+# https://gitlab.freedesktop.org/libinput/libinput/-/issues/562
+[Lenovo Yoga 9i Pressurepad]
+MatchBus=i2c
+MatchVendor=0x06CB
+MatchProduct=0xCE37
+AttrEventCodeDisable=ABS_MT_PRESSURE;ABS_PRESSURE;
 
 # Lenovo Carbon X1 6th gen (RMI4 only, PS/2 is broken on this device,
 # sends bogus ABS_MT_TOOL_TYPE events for MT_TOOL_PALM

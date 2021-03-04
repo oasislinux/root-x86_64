@@ -14,15 +14,17 @@ MatchName=*SynPS/2 Synaptics TouchPad
 MatchDMIModalias=dmi:*svnHewlett-Packard:*pnHPCompaq8510w*
 AttrEventCodeDisable=BTN_TOOL_DOUBLETAP;BTN_TOOL_TRIPLETAP;
 
-[HP Pavillion dmi4]
+[HP Pavilion dmi4]
 MatchName=*SynPS/2 Synaptics TouchPad
 MatchDMIModalias=dmi:*svnHewlett-Packard:*pnHPPaviliondm4NotebookPC*
 ModelHPPavilionDM4Touchpad=1
 
+# Touchpad is a clickpad but INPUT_PROP_BUTTONPAD is not set, see
+# https://bugs.freedesktop.org/show_bug.cgi?id=97147
 [HP Stream 11]
 MatchName=SYN1EDE:00 06CB:7442
 MatchDMIModalias=dmi:*svnHewlett-Packard:pnHPStreamNotebookPC11*
-ModelHPStream11Touchpad=1
+AttrInputPropEnable=INPUT_PROP_BUTTONPAD
 
 # The HP stream x360's embedded-controller filters out events form its builtin
 # keyboard when in tablet-mode itself; and it has a capacitive home-button
@@ -44,7 +46,7 @@ MatchName=*Cypress APA Trackpad *cyapa*
 MatchDMIModalias=dmi:*svnHewlett-Packard*:pnFalco*
 AttrPressureRange=12:8
 
-[HP Spectre x360 Convertable 15-bl1xx]
+[HP Spectre x360 Convertible 15-bl1xx]
 MatchUdevType=touchpad
 MatchName=*SynPS/2 Synaptics TouchPad
 MatchDMIModalias=dmi:*svnHP:pnHPSpectrex360Convertible15-bl1XX:*
@@ -52,7 +54,7 @@ AttrPressureRange=55:40
 AttrThumbPressureThreshold=90
 AttrPalmPressureThreshold=100
 
-[HP Spectre x360 Convertable 15-ch0xx]
+[HP Spectre x360 Convertible 15-ch0xx]
 MatchUdevType=touchpad
 MatchName=*SynPS/2 Synaptics TouchPad
 MatchDMIModalias=dmi:*svnHP:pnHPSpectrex360Convertible15-ch0xx:*
