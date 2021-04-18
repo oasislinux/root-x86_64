@@ -205,3 +205,19 @@ ModelTabletModeNoSuspend=1
 MatchName=AT Raw Set 2 keyboard
 MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkPadX1Tablet:*
 ModelTabletModeNoSuspend=1
+
+# Misidentified as an external keyboard by libinput
+# Tested on Legion 5 15AR05H 
+[Lenovo Legion 5 Keyboard]
+MatchUdevType=keyboard
+MatchBus=usb
+MatchVendor=0x048D
+MatchProduct=0xC100
+AttrKeyboardIntegration=internal
+
+[Lenovo Legion 5 Keyboard]
+MatchUdevType=keyboard
+MatchBus=usb
+MatchVendor=0x048D
+MatchProduct=0xC955
+AttrKeyboardIntegration=internal

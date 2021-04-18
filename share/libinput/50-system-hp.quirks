@@ -22,7 +22,7 @@ ModelHPPavilionDM4Touchpad=1
 # Touchpad is a clickpad but INPUT_PROP_BUTTONPAD is not set, see
 # https://bugs.freedesktop.org/show_bug.cgi?id=97147
 [HP Stream 11]
-MatchName=SYN1EDE:00 06CB:7442
+MatchName=SYN1EDE:00 06CB:7442*
 MatchDMIModalias=dmi:*svnHewlett-Packard:pnHPStreamNotebookPC11*
 AttrInputPropEnable=INPUT_PROP_BUTTONPAD
 
