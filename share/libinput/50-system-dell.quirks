@@ -82,6 +82,12 @@ MatchName=*DualPoint Stick
 MatchDMIModalias=dmi:*svnDellInc.:pnLatitudeE7470*
 AttrTrackpointMultiplier=0.125
 
+[Latitude 7490 Trackpoint]
+MatchName=*Mouse
+MatchUdevType=pointingstick
+MatchDMIModalias=dmi:**bvnDellInc.:*:pnLatitude7490*
+AttrTrackpointMultiplier=0.3
+
 [Precision 7x50 Touchpad]
 MatchBus=i2c
 MatchUdevType=touchpad
