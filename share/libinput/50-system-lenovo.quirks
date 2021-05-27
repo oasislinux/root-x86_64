@@ -222,6 +222,14 @@ MatchVendor=0x048D
 MatchProduct=0xC955
 AttrKeyboardIntegration=internal
 
+# Tested on Lenovo Legion 5 Pro 16ACH6H
+[Lenovo Legion 5 Pro Keyboard]
+MatchUdevType=keyboard
+MatchBus=usb
+MatchVendor=0x048D
+MatchProduct=0xC101
+AttrKeyboardIntegration=internal
+
 # https://gitlab.freedesktop.org/libinput/libinput/-/issues/604
 [Lenovo Yoga Slim 9 14ITL5 Pressurepad]
 MatchBus=i2c
