@@ -433,8 +433,10 @@
 #define __NR_process_madvise 440
 #define __NR_epoll_pwait2 441
 #define __NR_mount_setattr 442
+#define __NR_quotactl_fd 443
 #define __NR_landlock_create_ruleset 444
 #define __NR_landlock_add_rule 445
 #define __NR_landlock_restrict_self 446
+#define __NR_memfd_secret 447
 
 #endif /* _ASM_X86_UNISTD_32_H */

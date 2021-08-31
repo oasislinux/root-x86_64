@@ -545,22 +545,30 @@ struct __snd_pcm_sync_ptr {
 	} c;
 };
 
+#if __BITS_PER_LONG == 32
 #if defined(__BYTE_ORDER) ? __BYTE_ORDER == __BIG_ENDIAN : defined(__BIG_ENDIAN)
-typedef char __pad_before_uframe[sizeof(__u64) - sizeof(snd_pcm_uframes_t)];
-typedef char __pad_after_uframe[0];
+#define __PAD_BEFORE_UFRAME(x) char x[sizeof(__u64) - sizeof(snd_pcm_uframes_t)];
 #endif
 
 #if defined(__BYTE_ORDER) ? __BYTE_ORDER == __LITTLE_ENDIAN : defined(__LITTLE_ENDIAN)
-typedef char __pad_before_uframe[0];
-typedef char __pad_after_uframe[sizeof(__u64) - sizeof(snd_pcm_uframes_t)];
+#define __PAD_AFTER_UFRAME(x) char x[sizeof(__u64) - sizeof(snd_pcm_uframes_t)];
+#endif
+#endif
+
+#ifndef __PAD_BEFORE_UFRAME
+#define __PAD_BEFORE_UFRAME(x)
+#endif
+
+#ifndef __PAD_AFTER_UFRAME
+#define __PAD_AFTER_UFRAME(x)
 #endif
 
 struct __snd_pcm_mmap_status64 {
 	snd_pcm_state_t state;		/* RO: state - SNDRV_PCM_STATE_XXXX */
 	__u32 pad1;			/* Needed for 64 bit alignment */
-	__pad_before_uframe __pad1;
+	__PAD_BEFORE_UFRAME(__pad1)
 	snd_pcm_uframes_t hw_ptr;	/* RO: hw ptr (0...boundary-1) */
-	__pad_after_uframe __pad2;
+	__PAD_AFTER_UFRAME(__pad2)
 	struct __snd_timespec64 tstamp;	/* Timestamp */
 	snd_pcm_state_t suspended_state;/* RO: suspended stream state */
 	__u32 pad3;			/* Needed for 64 bit alignment */
@@ -568,14 +576,17 @@ struct __snd_pcm_mmap_status64 {
 };
 
 struct __snd_pcm_mmap_control64 {
-	__pad_before_uframe __pad1;
+	__PAD_BEFORE_UFRAME(__pad1)
 	snd_pcm_uframes_t appl_ptr;	 /* RW: appl ptr (0...boundary-1) */
-	__pad_before_uframe __pad2;
+	__PAD_BEFORE_UFRAME(__pad2)
 
-	__pad_before_uframe __pad3;
+	__PAD_BEFORE_UFRAME(__pad3)
 	snd_pcm_uframes_t  avail_min;	 /* RW: min available frames for wakeup */
-	__pad_after_uframe __pad4;
+	__PAD_AFTER_UFRAME(__pad4)
 };
+
+#undef __PAD_BEFORE_UFRAME
+#undef __PAD_AFTER_UFRAME
 
 struct __snd_pcm_sync_ptr64 {
 	__u32 flags;
@@ -702,7 +713,7 @@ enum {
  *  Raw MIDI section - /dev/snd/midi??
  */
 
-#define SNDRV_RAWMIDI_VERSION		SNDRV_PROTOCOL_VERSION(2, 0, 1)
+#define SNDRV_RAWMIDI_VERSION		SNDRV_PROTOCOL_VERSION(2, 0, 2)
 
 enum {
 	SNDRV_RAWMIDI_STREAM_OUTPUT = 0,
@@ -728,12 +739,38 @@ struct snd_rawmidi_info {
 	unsigned char reserved[64];	/* reserved for future use */
 };
 
+#define SNDRV_RAWMIDI_MODE_FRAMING_MASK		(7<<0)
+#define SNDRV_RAWMIDI_MODE_FRAMING_SHIFT	0
+#define SNDRV_RAWMIDI_MODE_FRAMING_NONE		(0<<0)
+#define SNDRV_RAWMIDI_MODE_FRAMING_TSTAMP	(1<<0)
+#define SNDRV_RAWMIDI_MODE_CLOCK_MASK		(7<<3)
+#define SNDRV_RAWMIDI_MODE_CLOCK_SHIFT		3
+#define SNDRV_RAWMIDI_MODE_CLOCK_NONE		(0<<3)
+#define SNDRV_RAWMIDI_MODE_CLOCK_REALTIME	(1<<3)
+#define SNDRV_RAWMIDI_MODE_CLOCK_MONOTONIC	(2<<3)
+#define SNDRV_RAWMIDI_MODE_CLOCK_MONOTONIC_RAW	(3<<3)
+
+#define SNDRV_RAWMIDI_FRAMING_DATA_LENGTH 16
+
+struct snd_rawmidi_framing_tstamp {
+	/* For now, frame_type is always 0. Midi 2.0 is expected to add new
+	 * types here. Applications are expected to skip unknown frame types.
+	 */
+	__u8 frame_type;
+	__u8 length; /* number of valid bytes in data field */
+	__u8 reserved[2];
+	__u32 tv_nsec;		/* nanoseconds */
+	__u64 tv_sec;		/* seconds */
+	__u8 data[SNDRV_RAWMIDI_FRAMING_DATA_LENGTH];
+} __attribute__((packed));
+
 struct snd_rawmidi_params {
 	int stream;
 	size_t buffer_size;		/* queue size in bytes */
 	size_t avail_min;		/* minimum avail bytes for wakeup */
 	unsigned int no_active_sensing: 1; /* do not send active sensing byte in close() */
-	unsigned char reserved[16];	/* reserved for future use */
+	unsigned int mode;		/* For input data only, frame incoming data */
+	unsigned char reserved[12];	/* reserved for future use */
 };
 
 struct snd_rawmidi_status {
