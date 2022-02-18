@@ -26,6 +26,11 @@ MatchName=Synaptics tm2964-001
 MatchDMIModalias=dmi:*svnLENOVO:*:pvrThinkPadT440p*
 ModelLenovoT450Touchpad=1
 
+[Lenovo T470 Trackpoint]
+MatchName=*TPPS/2 IBM TrackPoint
+MatchDMIModalias=dmi:*svnLENOVO:*:pvrThinkPadT470:*
+AttrTrackpointMultiplier=0.4
+
 [Lenovo T480 Trackpoint]
 MatchName=*TPPS/2 IBM TrackPoint
 MatchDMIModalias=dmi:*svnLENOVO:*:pvrThinkPadT480:*
@@ -144,6 +149,12 @@ MatchVendor=0x06CB
 MatchProduct=0xCE37
 AttrEventCodeDisable=ABS_MT_PRESSURE;ABS_PRESSURE;
 
+[Lenovo Yoga C930 Tablet]
+MatchBus=i2c
+MatchVendor=0x056A
+MatchProduct=0x5196
+AttrTabletSmoothing=1
+
 # Lenovo Carbon X1 6th gen (RMI4 only, PS/2 is broken on this device,
 # sends bogus ABS_MT_TOOL_TYPE events for MT_TOOL_PALM
 [Lenovo Carbon X1 6th gen]
@@ -160,6 +171,11 @@ ModelTabletModeNoSuspend=1
 [Lenovo X60 Tablet]
 MatchName=AT Translated Set 2 keyboard
 MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkPadX60Tablet:*
+ModelTabletModeNoSuspend=1
+
+[Lenovo X61 Tablet]
+MatchName=AT Translated Set 2 keyboard
+MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkPadX61Tablet:*
 ModelTabletModeNoSuspend=1
 
 # Lenovo X220 Tablet special bezel buttons are associated to the
@@ -207,7 +223,7 @@ MatchDMIModalias=dmi:*svnLENOVO:*pvrThinkPadX1Tablet:*
 ModelTabletModeNoSuspend=1
 
 # Misidentified as an external keyboard by libinput
-# Tested on Legion 5 15AR05H 
+# Tested on Legion 5 15AR05H
 [Lenovo Legion 5 Keyboard]
 MatchUdevType=keyboard
 MatchBus=usb
@@ -237,4 +253,30 @@ MatchVendor=0x27C6
 MatchProduct=0x01E8
 AttrEventCodeDisable=ABS_MT_PRESSURE;ABS_PRESSURE;
 
+# Duet 7i tablet switch activated by folding keyboard cover, or removing it.
+# We must not disable volume rocker 'keyboard'.
+[Lenovo Duet 7i]
+MatchName=AT Raw Set 2 keyboard
+MatchDMIModalias=dmi:*svnLENOVO:*pvrYogaDuet713IML05:*
+ModelTabletModeNoSuspend=1
 
+# https://gitlab.freedesktop.org/libinput/libinput/-/issues/651
+[Lenovo TrackPoint Keyboard II USB]
+MatchBus=usb
+MatchVendor=0x17EF
+MatchProduct=0x60EE
+ModelLenovoTrackpointKeyboard2=1
+
+[Lenovo TrackPoint Keyboard II Bluetooth]
+MatchBus=bluetooth
+MatchVendor=0x17EF
+MatchProduct=0x60E1
+ModelLenovoTrackpointKeyboard2=1
+
+# Modifies pressure range to avoid random jumps.
+# https://gitlab.freedesktop.org/libinput/libinput/-/issues/407
+[Lenovo Yoga 2 Pro touchpad]
+MatchUdevType=touchpad
+MatchName=*SynPS/2 Synaptics TouchPad
+MatchDMIModalias=dmi:*svnLENOVO:*:pvrLenovoYoga2Pro*
+AttrPressureRange=50:45

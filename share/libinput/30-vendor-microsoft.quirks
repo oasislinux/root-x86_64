@@ -15,6 +15,11 @@ MatchName=*Microsoft Surface *Keyboard*
 MatchDMIModalias=dmi:*svnMicrosoftCorporation:*
 AttrKeyboardIntegration=internal
 
+[Microsoft Surface Cover]
+MatchName=*Microsoft Surface *Cover*
+MatchDMIModalias=dmi:*svnMicrosoftCorporation:*
+AttrKeyboardIntegration=internal
+
 [Microsoft Nano Transceiver v2.0]
 MatchUdevType=mouse
 MatchBus=usb

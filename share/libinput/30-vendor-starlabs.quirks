@@ -1,0 +1,41 @@
+[StarBook Mk V]
+MatchName=STAR0001:00 093A:0255 Touchpad
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnStarLabs:pnStarBook*
+AttrEventCodeDisable=BTN_RIGHT
+
+[StarLabTop Mk IV - coreboot firmware]
+MatchName=STAR0001:00 093A:1336 Touchpad
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnStarLabs:pnLabTop*
+AttrEventCodeDisable=BTN_RIGHT
+
+[StarLabTop Mk IV - AMI firmware]
+MatchName=PCT1336:00 093A:1336 Touchpad
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnStarLabs:pnLabTop*
+AttrEventCodeDisable=BTN_RIGHT
+
+[StarLite Mk III - coreboot firmware]
+MatchName=STAR0001:00 093A:0255 Touchpad
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnStarLabs:pnLite*
+AttrEventCodeDisable=BTN_RIGHT
+
+[StarLite Mk III - AMI firmware]
+MatchName=HTIX5288:00 093A:0255 Touchpad
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnStarLabs:pnLite*
+AttrEventCodeDisable=BTN_RIGHT
+
+[StarLite Mk II - coreboot firmware]
+MatchName=STAR0001:00 0911:5288 Touchpad
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnStarLabs:pnLite*
+AttrEventCodeDisable=BTN_RIGHT
+
+[StarLite Mk II - AMI firmware]
+MatchName=ALPS0001:00 0911:5288 Touchpad
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnStarLabs:pnLite*
+AttrEventCodeDisable=BTN_RIGHT

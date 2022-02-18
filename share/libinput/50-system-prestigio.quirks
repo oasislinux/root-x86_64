@@ -1,0 +1,7 @@
+# Clickpad that announces BTN_RIGHT
+# https://gitlab.freedesktop.org/libinput/libinput/-/issues/674
+[Prestigio Smartbook 141 C2 Touchpad]
+MatchName=SYNA3602:00 0911:5288 Touchpad
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnPrestigio:*pnPSB141C02*
+AttrEventCodeDisable=BTN_RIGHT

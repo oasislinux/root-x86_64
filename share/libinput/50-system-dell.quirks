@@ -14,6 +14,7 @@ AttrMscTimestamp=watch
 [Dell Inspiron 15R N5110 Touchpad]
 MatchUdevType=touchpad
 MatchName=*AlpsPS/2 ALPS GlidePoint
+MatchVersion=0x0300
 MatchDMIModalias=dmi:*svnDellInc.:*pnInspironN5110*
 AttrPressureRange=100:95
 
@@ -81,6 +82,11 @@ AttrTrackpointMultiplier=1.5
 MatchName=*DualPoint Stick
 MatchDMIModalias=dmi:*svnDellInc.:pnLatitudeE7470*
 AttrTrackpointMultiplier=0.125
+
+[Latitude 7480 Touchpad]
+MatchName=DLL07A0*
+MatchDMIModalias=dmi:**bvnDellInc.:*:pnLatitude7480*
+AttrPressureRange=35:34
 
 [Latitude 7490 Trackpoint]
 MatchName=*Mouse
