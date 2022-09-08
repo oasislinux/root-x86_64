@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import json
 import uuid
 
@@ -11,6 +8,7 @@ from ..utils import (
     ExtractorError,
     float_or_none,
     int_or_none,
+    remove_start,
     strip_or_none,
     try_get,
     unified_timestamp,
@@ -314,7 +312,7 @@ class DPlayIE(DPlayBaseIE):
     def _real_extract(self, url):
         mobj = self._match_valid_url(url)
         display_id = mobj.group('id')
-        domain = mobj.group('domain').lstrip('www.')
+        domain = remove_start(mobj.group('domain'), 'www.')
         country = mobj.group('country') or mobj.group('subdomain_country') or mobj.group('plus_country')
         host = 'disco-api.' + domain if domain[0] == 'd' else 'eu2-prod.disco-api.com'
         return self._get_disco_api_info(
@@ -715,6 +713,33 @@ class TLCIE(DiscoveryPlusBaseIE):
     _PRODUCT = 'tlc'
     _DISCO_API_PARAMS = {
         'disco_host': 'us1-prod-direct.tlc.com',
+        'realm': 'go',
+        'country': 'us',
+    }
+
+
+class MotorTrendIE(DiscoveryPlusBaseIE):
+    _VALID_URL = r'https?://(?:watch\.)?motortrend\.com/video' + DPlayBaseIE._PATH_REGEX
+    _TESTS = [{
+        'url': 'https://watch.motortrend.com/video/car-issues-motortrend-atve-us/double-dakotas',
+        'info_dict': {
+            'id': '"4859182"',
+            'display_id': 'double-dakotas',
+            'ext': 'mp4',
+            'title': 'Double Dakotas',
+            'description': 'Tylers buy-one-get-one Dakota deal has the Wizard pulling double duty.',
+            'season_number': 2,
+            'episode_number': 3,
+        },
+        'skip': 'Available for Premium users',
+    }, {
+        'url': 'https://watch.motortrend.com/video/car-issues-motortrend-atve-us/double-dakotas',
+        'only_matching': True,
+    }]
+
+    _PRODUCT = 'vel'
+    _DISCO_API_PARAMS = {
+        'disco_host': 'us1-prod-direct.watch.motortrend.com',
         'realm': 'go',
         'country': 'us',
     }

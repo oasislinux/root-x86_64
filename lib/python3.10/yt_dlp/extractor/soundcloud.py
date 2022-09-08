@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import itertools
 import re
 import json
@@ -12,7 +9,6 @@ from .common import (
 )
 from ..compat import (
     compat_HTTPError,
-    compat_kwargs,
     compat_str,
 )
 from ..utils import (
@@ -23,7 +19,6 @@ from ..utils import (
     int_or_none,
     KNOWN_EXTENSIONS,
     mimetype2ext,
-    remove_end,
     parse_qs,
     str_or_none,
     try_get,
@@ -37,17 +32,12 @@ from ..utils import (
 
 class SoundcloudEmbedIE(InfoExtractor):
     _VALID_URL = r'https?://(?:w|player|p)\.soundcloud\.com/player/?.*?\burl=(?P<id>.+)'
+    _EMBED_REGEX = [r'<iframe[^>]+src=(["\'])(?P<url>(?:https?://)?(?:w\.)?soundcloud\.com/player.+?)\1']
     _TEST = {
         # from https://www.soundi.fi/uutiset/ennakkokuuntelussa-timo-kaukolammen-station-to-station-to-station-julkaisua-juhlitaan-tanaan-g-livelabissa/
         'url': 'https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F922213810&show_artwork=true&maxwidth=640&maxheight=960&dnt=1&secret_token=s-ziYey',
         'only_matching': True,
     }
-
-    @staticmethod
-    def _extract_urls(webpage):
-        return [m.group('url') for m in re.finditer(
-            r'<iframe[^>]+src=(["\'])(?P<url>(?:https?://)?(?:w\.)?soundcloud\.com/player.+?)\1',
-            webpage)]
 
     def _real_extract(self, url):
         query = parse_qs(url)
@@ -59,11 +49,19 @@ class SoundcloudEmbedIE(InfoExtractor):
 
 
 class SoundcloudBaseIE(InfoExtractor):
+    _NETRC_MACHINE = 'soundcloud'
+
     _API_V2_BASE = 'https://api-v2.soundcloud.com/'
     _BASE_URL = 'https://soundcloud.com/'
+    _USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
+    _API_AUTH_QUERY_TEMPLATE = '?client_id=%s'
+    _API_AUTH_URL_PW = 'https://api-auth.soundcloud.com/web-auth/sign-in/password%s'
+    _API_VERIFY_AUTH_TOKEN = 'https://api-auth.soundcloud.com/connect/session%s'
+    _access_token = None
+    _HEADERS = {}
 
     def _store_client_id(self, client_id):
-        self._downloader.cache.store('soundcloud', 'client_id', client_id)
+        self.cache.store('soundcloud', 'client_id', client_id)
 
     def _update_client_id(self):
         webpage = self._download_webpage('https://soundcloud.com/', None)
@@ -88,7 +86,7 @@ class SoundcloudBaseIE(InfoExtractor):
             query['client_id'] = self._CLIENT_ID
             kwargs['query'] = query
             try:
-                return super()._download_json(*args, **compat_kwargs(kwargs))
+                return super()._download_json(*args, **kwargs)
             except ExtractorError as e:
                 if isinstance(e.cause, compat_HTTPError) and e.cause.code in (401, 403):
                     self._store_client_id(None)
@@ -99,38 +97,24 @@ class SoundcloudBaseIE(InfoExtractor):
                     return False
                 raise
 
-    def _real_initialize(self):
-        self._CLIENT_ID = self._downloader.cache.load('soundcloud', 'client_id') or 'a3e059563d7fd3372b49b37f00a00bcf'
-        self._login()
+    def _initialize_pre_login(self):
+        self._CLIENT_ID = self.cache.load('soundcloud', 'client_id') or 'a3e059563d7fd3372b49b37f00a00bcf'
 
-    _USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
-    _API_AUTH_QUERY_TEMPLATE = '?client_id=%s'
-    _API_AUTH_URL_PW = 'https://api-auth.soundcloud.com/web-auth/sign-in/password%s'
-    _API_VERIFY_AUTH_TOKEN = 'https://api-auth.soundcloud.com/connect/session%s'
-    _access_token = None
-    _HEADERS = {}
-    _NETRC_MACHINE = 'soundcloud'
-
-    def _login(self):
-        username, password = self._get_login_info()
-        if username is None:
-            return
-
-        if username == 'oauth' and password is not None:
-            self._access_token = password
-            query = self._API_AUTH_QUERY_TEMPLATE % self._CLIENT_ID
-            payload = {'session': {'access_token': self._access_token}}
-            token_verification = sanitized_Request(self._API_VERIFY_AUTH_TOKEN % query, json.dumps(payload).encode('utf-8'))
-            response = self._download_json(token_verification, None, note='Verifying login token...', fatal=False)
-            if response is not False:
-                self._HEADERS = {'Authorization': 'OAuth ' + self._access_token}
-                self.report_login()
-            else:
-                self.report_warning('Provided authorization token seems to be invalid. Continue as guest')
-        elif username is not None:
+    def _perform_login(self, username, password):
+        if username != 'oauth':
             self.report_warning(
                 'Login using username and password is not currently supported. '
                 'Use "--username oauth --password <oauth_token>" to login using an oauth token')
+        self._access_token = password
+        query = self._API_AUTH_QUERY_TEMPLATE % self._CLIENT_ID
+        payload = {'session': {'access_token': self._access_token}}
+        token_verification = sanitized_Request(self._API_VERIFY_AUTH_TOKEN % query, json.dumps(payload).encode('utf-8'))
+        response = self._download_json(token_verification, None, note='Verifying login token...', fatal=False)
+        if response is not False:
+            self._HEADERS = {'Authorization': 'OAuth ' + self._access_token}
+            self.report_login()
+        else:
+            self.report_warning('Provided authorization token seems to be invalid. Continue as guest')
 
         r'''
         def genDevId():
@@ -676,25 +660,20 @@ class SoundcloudPagedPlaylistBaseIE(SoundcloudBaseIE):
             'offset': 0,
         }
 
-        retries = self.get_param('extractor_retries', 3)
-
         for i in itertools.count():
-            attempt, last_error = -1, None
-            while attempt < retries:
-                attempt += 1
-                if last_error:
-                    self.report_warning('%s. Retrying ...' % remove_end(last_error, '.'), playlist_id)
+            for retry in self.RetryManager():
                 try:
                     response = self._download_json(
                         url, playlist_id, query=query, headers=self._HEADERS,
-                        note='Downloading track page %s%s' % (i + 1, f' (retry #{attempt})' if attempt else ''))
+                        note=f'Downloading track page {i + 1}')
                     break
                 except ExtractorError as e:
                     # Downloading page may result in intermittent 502 HTTP error
                     # See https://github.com/yt-dlp/yt-dlp/issues/872
-                    if attempt >= retries or not isinstance(e.cause, compat_HTTPError) or e.cause.code != 502:
+                    if not isinstance(e.cause, compat_HTTPError) or e.cause.code != 502:
                         raise
-                    last_error = str(e.cause or e.msg)
+                    retry.error = e
+                    continue
 
             def resolve_entry(*candidates):
                 for cand in candidates:

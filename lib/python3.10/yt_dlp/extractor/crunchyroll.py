@@ -1,22 +1,20 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import base64
-import re
 import json
+import re
+import urllib.request
+import xml.etree.ElementTree
 import zlib
-
 from hashlib import sha1
-from math import pow, sqrt, floor
+from math import floor, pow, sqrt
+
 from .common import InfoExtractor
-from .vrv import VRVIE
+from .vrv import VRVBaseIE
+from ..aes import aes_cbc_decrypt
 from ..compat import (
     compat_b64decode,
-    compat_etree_Element,
     compat_etree_fromstring,
     compat_str,
     compat_urllib_parse_urlencode,
-    compat_urllib_request,
     compat_urlparse,
 )
 from ..utils import (
@@ -25,20 +23,18 @@ from ..utils import (
     extract_attributes,
     float_or_none,
     format_field,
-    intlist_to_bytes,
     int_or_none,
+    intlist_to_bytes,
     join_nonempty,
     lowercase_escape,
     merge_dicts,
+    parse_iso8601,
     qualities,
     remove_end,
     sanitized_Request,
     traverse_obj,
     try_get,
     xpath_text,
-)
-from ..aes import (
-    aes_cbc_decrypt,
 )
 
 
@@ -57,10 +53,7 @@ class CrunchyrollBaseIE(InfoExtractor):
                 'Content-Type': 'application/x-www-form-urlencoded',
             })
 
-    def _login(self):
-        username, password = self._get_login_info()
-        if username is None:
-            return
+    def _perform_login(self, username, password):
         if self._get_cookies(self._LOGIN_URL).get('etp_rt'):
             return
 
@@ -85,12 +78,25 @@ class CrunchyrollBaseIE(InfoExtractor):
                 'session_id': session_id
             }).encode('ascii'))
         if login_response['code'] != 'ok':
-            raise ExtractorError('Login failed. Bad username or password?', expected=True)
+            raise ExtractorError('Login failed. Server message: %s' % login_response['message'], expected=True)
         if not self._get_cookies(self._LOGIN_URL).get('etp_rt'):
             raise ExtractorError('Login succeeded but did not set etp_rt cookie')
 
-    def _real_initialize(self):
-        self._login()
+    # Beta-specific, but needed for redirects
+    def _get_beta_embedded_json(self, webpage, display_id):
+        initial_state = self._parse_json(self._search_regex(
+            r'__INITIAL_STATE__\s*=\s*({.+?})\s*;', webpage, 'initial state'), display_id)
+        app_config = self._parse_json(self._search_regex(
+            r'__APP_CONFIG__\s*=\s*({.+?})\s*;', webpage, 'app config'), display_id)
+        return initial_state, app_config
+
+    def _redirect_to_beta(self, webpage, iekey, video_id):
+        if not self._get_cookies(self._LOGIN_URL).get('etp_rt'):
+            raise ExtractorError('Received a beta page from non-beta url when not logged in.')
+        initial_state, app_config = self._get_beta_embedded_json(webpage, video_id)
+        url = app_config['baseSiteUrl'] + initial_state['router']['locations']['current']['pathname']
+        self.to_screen(f'{video_id}: Redirected to beta site - {url}')
+        return self.url_result(f'{url}', iekey, video_id)
 
     @staticmethod
     def _add_skip_wall(url):
@@ -106,9 +112,16 @@ class CrunchyrollBaseIE(InfoExtractor):
             parsed_url._replace(query=compat_urllib_parse_urlencode(qs, True)))
 
 
-class CrunchyrollIE(CrunchyrollBaseIE, VRVIE):
+class CrunchyrollIE(CrunchyrollBaseIE, VRVBaseIE):
     IE_NAME = 'crunchyroll'
-    _VALID_URL = r'https?://(?:(?P<prefix>www|m)\.)?(?P<url>crunchyroll\.(?:com|fr)/(?:media(?:-|/\?id=)|(?:[^/]*/){1,2}[^/?&]*?)(?P<id>[0-9]+))(?:[/?&]|$)'
+    _VALID_URL = r'''(?x)
+        https?://(?:(?P<prefix>www|m)\.)?(?P<url>
+            crunchyroll\.(?:com|fr)/(?:
+                media(?:-|/\?id=)|
+                (?!series/|watch/)(?:[^/]+/){1,2}[^/?&#]*?
+            )(?P<id>[0-9]+)
+        )(?:[/?&#]|$)'''
+
     _TESTS = [{
         'url': 'http://www.crunchyroll.com/wanna-be-the-strongest-in-the-world/episode-1-an-idol-wrestler-is-born-645513',
         'info_dict': {
@@ -252,7 +265,7 @@ class CrunchyrollIE(CrunchyrollBaseIE, VRVIE):
     }
 
     def _download_webpage(self, url_or_request, *args, **kwargs):
-        request = (url_or_request if isinstance(url_or_request, compat_urllib_request.Request)
+        request = (url_or_request if isinstance(url_or_request, urllib.request.Request)
                    else sanitized_Request(url_or_request))
         # Accept-Language must be set explicitly to accept any language to avoid issues
         # similar to https://github.com/ytdl-org/youtube-dl/issues/6797.
@@ -385,7 +398,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 'Downloading subtitles for ' + sub_name, data={
                     'subtitle_script_id': sub_id,
                 })
-            if not isinstance(sub_doc, compat_etree_Element):
+            if not isinstance(sub_doc, xml.etree.ElementTree.Element):
                 continue
             sid = sub_doc.get('id')
             iv = xpath_text(sub_doc, 'iv', 'subtitle iv')
@@ -412,6 +425,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         webpage = self._download_webpage(
             self._add_skip_wall(webpage_url), video_id,
             headers=self.geo_verification_headers())
+        if re.search(r'<div id="preload-data">', webpage):
+            return self._redirect_to_beta(webpage, CrunchyrollBetaIE.ie_key(), video_id)
         note_m = self._html_search_regex(
             r'<div class="showmedia-trailer-notice">(.+?)</div>',
             webpage, 'trailer-notice', default='')
@@ -513,7 +528,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                         'video_quality': stream_quality,
                         'current_page': url,
                     })
-                if isinstance(streamdata, compat_etree_Element):
+                if isinstance(streamdata, xml.etree.ElementTree.Element):
                     stream_info = streamdata.find('./{default}preload/stream_info')
                     if stream_info is not None:
                         stream_infos.append(stream_info)
@@ -524,7 +539,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                         'video_format': stream_format,
                         'video_encode_quality': stream_quality,
                     })
-                if isinstance(stream_info, compat_etree_Element):
+                if isinstance(stream_info, xml.etree.ElementTree.Element):
                     stream_infos.append(stream_info)
                 for stream_info in stream_infos:
                     video_encode_id = xpath_text(stream_info, './video_encode_id')
@@ -599,7 +614,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
         season = episode = episode_number = duration = None
 
-        if isinstance(metadata, compat_etree_Element):
+        if isinstance(metadata, xml.etree.ElementTree.Element):
             season = xpath_text(metadata, 'series_title')
             episode = xpath_text(metadata, 'episode_title')
             episode_number = int_or_none(xpath_text(metadata, 'episode_number'))
@@ -642,7 +657,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
 class CrunchyrollShowPlaylistIE(CrunchyrollBaseIE):
     IE_NAME = 'crunchyroll:playlist'
-    _VALID_URL = r'https?://(?:(?P<prefix>www|m)\.)?(?P<url>crunchyroll\.com/(?:\w{1,2}/)?(?!(?:news|anime-news|library|forum|launchcalendar|lineup|store|comics|freetrial|login|media-\d+))(?P<id>[\w\-]+))/?(?:\?|$)'
+    _VALID_URL = r'https?://(?:(?P<prefix>www|m)\.)?(?P<url>crunchyroll\.com/(?:\w{2}(?:-\w{2})?/)?(?!(?:news|anime-news|library|forum|launchcalendar|lineup|store|comics|freetrial|login|media-\d+))(?P<id>[\w\-]+))/?(?:\?|$)'
 
     _TESTS = [{
         'url': 'https://www.crunchyroll.com/a-bridge-to-the-starry-skies-hoshizora-e-kakaru-hashi',
@@ -676,6 +691,8 @@ class CrunchyrollShowPlaylistIE(CrunchyrollBaseIE):
             # https:// gives a 403, but http:// does not
             self._add_skip_wall(url).replace('https://', 'http://'), show_id,
             headers=self.geo_verification_headers())
+        if re.search(r'<div id="preload-data">', webpage):
+            return self._redirect_to_beta(webpage, CrunchyrollBetaShowIE.ie_key(), show_id)
         title = self._html_search_meta('name', webpage, default=None)
 
         episode_re = r'<li id="showview_videos_media_(\d+)"[^>]+>.*?<a href="([^"]+)"'
@@ -698,116 +715,117 @@ class CrunchyrollShowPlaylistIE(CrunchyrollBaseIE):
         }
 
 
-class CrunchyrollBetaIE(CrunchyrollBaseIE):
+class CrunchyrollBetaBaseIE(CrunchyrollBaseIE):
+    params = None
+
+    def _get_params(self, lang):
+        if not CrunchyrollBetaBaseIE.params:
+            if self._get_cookies(f'https://beta.crunchyroll.com/{lang}').get('etp_rt'):
+                grant_type, key = 'etp_rt_cookie', 'accountAuthClientId'
+            else:
+                grant_type, key = 'client_id', 'anonClientId'
+
+            initial_state, app_config = self._get_beta_embedded_json(self._download_webpage(
+                f'https://beta.crunchyroll.com/{lang}', None, note='Retrieving main page'), None)
+            api_domain = app_config['cxApiParams']['apiDomain']
+
+            auth_response = self._download_json(
+                f'{api_domain}/auth/v1/token', None, note=f'Authenticating with grant_type={grant_type}',
+                headers={
+                    'Authorization': 'Basic ' + str(base64.b64encode(('%s:' % app_config['cxApiParams'][key]).encode('ascii')), 'ascii')
+                }, data=f'grant_type={grant_type}'.encode('ascii'))
+            policy_response = self._download_json(
+                f'{api_domain}/index/v2', None, note='Retrieving signed policy',
+                headers={
+                    'Authorization': auth_response['token_type'] + ' ' + auth_response['access_token']
+                })
+            cms = traverse_obj(policy_response, 'cms_beta', 'cms')
+            bucket = cms['bucket']
+            params = {
+                'Policy': cms['policy'],
+                'Signature': cms['signature'],
+                'Key-Pair-Id': cms['key_pair_id']
+            }
+            locale = traverse_obj(initial_state, ('localization', 'locale'))
+            if locale:
+                params['locale'] = locale
+            CrunchyrollBetaBaseIE.params = (api_domain, bucket, params)
+        return CrunchyrollBetaBaseIE.params
+
+
+class CrunchyrollBetaIE(CrunchyrollBetaBaseIE):
     IE_NAME = 'crunchyroll:beta'
-    _VALID_URL = r'https?://beta\.crunchyroll\.com/(?P<lang>(?:\w{1,2}/)?)watch/(?P<internal_id>\w+)/(?P<id>[\w\-]+)/?(?:\?|$)'
+    _VALID_URL = r'''(?x)
+        https?://beta\.crunchyroll\.com/
+        (?P<lang>(?:\w{2}(?:-\w{2})?/)?)
+        watch/(?P<id>\w+)
+        (?:/(?P<display_id>[\w-]+))?/?(?:[?#]|$)'''
     _TESTS = [{
         'url': 'https://beta.crunchyroll.com/watch/GY2P1Q98Y/to-the-future',
         'info_dict': {
-            'id': '696363',
+            'id': 'GY2P1Q98Y',
             'ext': 'mp4',
-            'timestamp': 1459610100,
+            'duration': 1380.241,
+            'timestamp': 1459632600,
             'description': 'md5:a022fbec4fbb023d43631032c91ed64b',
-            'uploader': 'Toei Animation',
             'title': 'World Trigger Episode 73 – To the Future',
             'upload_date': '20160402',
+            'series': 'World Trigger',
+            'series_id': 'GR757DMKY',
+            'season': 'World Trigger',
+            'season_id': 'GR9P39NJ6',
+            'season_number': 1,
+            'episode': 'To the Future',
+            'episode_number': 73,
+            'thumbnail': r're:^https://beta.crunchyroll.com/imgsrv/.*\.jpeg$',
         },
         'params': {'skip_download': 'm3u8'},
-        'expected_warnings': ['Unable to download XML']
+    }, {
+        'url': 'https://beta.crunchyroll.com/watch/GY2P1Q98Y',
+        'only_matching': True,
+    }, {
+        'url': 'https://beta.crunchyroll.com/pt-br/watch/G8WUN8VKP/the-ruler-of-conspiracy',
+        'only_matching': True,
     }]
 
     def _real_extract(self, url):
-        lang, internal_id, display_id = self._match_valid_url(url).group('lang', 'internal_id', 'id')
-        webpage = self._download_webpage(url, display_id)
-        initial_state = self._parse_json(
-            self._search_regex(r'__INITIAL_STATE__\s*=\s*({.+?})\s*;', webpage, 'initial state'),
-            display_id)
-        episode_data = initial_state['content']['byId'][internal_id]
-        if not self._get_cookies(url).get('etp_rt'):
-            video_id = episode_data['external_id'].split('.')[1]
-            series_id = episode_data['episode_metadata']['series_slug_title']
-            return self.url_result(f'https://www.crunchyroll.com/{lang}{series_id}/{display_id}-{video_id}',
-                                   CrunchyrollIE.ie_key(), video_id)
+        lang, internal_id, display_id = self._match_valid_url(url).group('lang', 'id', 'display_id')
+        api_domain, bucket, params = self._get_params(lang)
 
-        app_config = self._parse_json(
-            self._search_regex(r'__APP_CONFIG__\s*=\s*({.+?})\s*;', webpage, 'app config'),
-            display_id)
-        client_id = app_config['cxApiParams']['accountAuthClientId']
-        api_domain = app_config['cxApiParams']['apiDomain']
-        basic_token = str(base64.b64encode(('%s:' % client_id).encode('ascii')), 'ascii')
-        auth_response = self._download_json(
-            f'{api_domain}/auth/v1/token', display_id,
-            note='Authenticating with cookie',
-            headers={
-                'Authorization': 'Basic ' + basic_token
-            }, data='grant_type=etp_rt_cookie'.encode('ascii'))
-        policy_response = self._download_json(
-            f'{api_domain}/index/v2', display_id,
-            note='Retrieving signed policy',
-            headers={
-                'Authorization': auth_response['token_type'] + ' ' + auth_response['access_token']
-            })
-        bucket = policy_response['cms']['bucket']
-        params = {
-            'Policy': policy_response['cms']['policy'],
-            'Signature': policy_response['cms']['signature'],
-            'Key-Pair-Id': policy_response['cms']['key_pair_id']
-        }
-        locale = traverse_obj(initial_state, ('localization', 'locale'))
-        if locale:
-            params['locale'] = locale
         episode_response = self._download_json(
             f'{api_domain}/cms/v2{bucket}/episodes/{internal_id}', display_id,
-            note='Retrieving episode metadata',
-            query=params)
+            note='Retrieving episode metadata', query=params)
         if episode_response.get('is_premium_only') and not episode_response.get('playback'):
             raise ExtractorError('This video is for premium members only.', expected=True)
-        stream_response = self._download_json(
-            episode_response['playback'], display_id,
-            note='Retrieving stream info')
 
-        thumbnails = []
-        for thumbnails_data in traverse_obj(episode_response, ('images', 'thumbnail')):
-            for thumbnail_data in thumbnails_data:
-                thumbnails.append({
-                    'url': thumbnail_data.get('source'),
-                    'width': thumbnail_data.get('width'),
-                    'height': thumbnail_data.get('height'),
-                })
-        subtitles = {}
-        for lang, subtitle_data in stream_response.get('subtitles').items():
-            subtitles[lang] = [{
-                'url': subtitle_data.get('url'),
-                'ext': subtitle_data.get('format')
-            }]
+        stream_response = self._download_json(
+            f'{api_domain}{episode_response["__links__"]["streams"]["href"]}', display_id,
+            note='Retrieving stream info', query=params)
+        get_streams = lambda name: (traverse_obj(stream_response, name) or {}).items()
 
         requested_hardsubs = [('' if val == 'none' else val) for val in (self._configuration_arg('hardsub') or ['none'])]
         hardsub_preference = qualities(requested_hardsubs[::-1])
         requested_formats = self._configuration_arg('format') or ['adaptive_hls']
 
         formats = []
-        for stream_type, streams in stream_response.get('streams', {}).items():
+        for stream_type, streams in get_streams('streams'):
             if stream_type not in requested_formats:
                 continue
             for stream in streams.values():
                 hardsub_lang = stream.get('hardsub_locale') or ''
                 if hardsub_lang.lower() not in requested_hardsubs:
                     continue
-                format_id = join_nonempty(
-                    stream_type,
-                    format_field(stream, 'hardsub_locale', 'hardsub-%s'))
+                format_id = join_nonempty(stream_type, format_field(stream, 'hardsub_locale', 'hardsub-%s'))
                 if not stream.get('url'):
                     continue
-                if stream_type.split('_')[-1] == 'hls':
+                if stream_type.endswith('hls'):
                     adaptive_formats = self._extract_m3u8_formats(
                         stream['url'], display_id, 'mp4', m3u8_id=format_id,
-                        note='Downloading %s information' % format_id,
-                        fatal=False)
-                elif stream_type.split('_')[-1] == 'dash':
+                        fatal=False, note=f'Downloading {format_id} HLS manifest')
+                elif stream_type.endswith('dash'):
                     adaptive_formats = self._extract_mpd_formats(
                         stream['url'], display_id, mpd_id=format_id,
-                        note='Downloading %s information' % format_id,
-                        fatal=False)
+                        fatal=False, note=f'Downloading {format_id} MPD manifest')
                 for f in adaptive_formats:
                     if f.get('acodec') != 'none':
                         f['language'] = stream_response.get('audio_locale')
@@ -817,10 +835,11 @@ class CrunchyrollBetaIE(CrunchyrollBaseIE):
 
         return {
             'id': internal_id,
-            'title': '%s Episode %s – %s' % (episode_response.get('season_title'), episode_response.get('episode'), episode_response.get('title')),
-            'description': episode_response.get('description').replace(r'\r\n', '\n'),
+            'title': '%s Episode %s – %s' % (
+                episode_response.get('season_title'), episode_response.get('episode'), episode_response.get('title')),
+            'description': try_get(episode_response, lambda x: x['description'].replace(r'\r\n', '\n')),
             'duration': float_or_none(episode_response.get('duration_ms'), 1000),
-            'thumbnails': thumbnails,
+            'timestamp': parse_iso8601(episode_response.get('upload_date')),
             'series': episode_response.get('series_title'),
             'series_id': episode_response.get('series_id'),
             'season': episode_response.get('season_title'),
@@ -828,27 +847,75 @@ class CrunchyrollBetaIE(CrunchyrollBaseIE):
             'season_number': episode_response.get('season_number'),
             'episode': episode_response.get('title'),
             'episode_number': episode_response.get('sequence_number'),
-            'subtitles': subtitles,
-            'formats': formats
+            'formats': formats,
+            'thumbnails': [{
+                'url': thumb.get('source'),
+                'width': thumb.get('width'),
+                'height': thumb.get('height'),
+            } for thumb in traverse_obj(episode_response, ('images', 'thumbnail', ..., ...)) or []],
+            'subtitles': {
+                lang: [{
+                    'url': subtitle_data.get('url'),
+                    'ext': subtitle_data.get('format')
+                }] for lang, subtitle_data in get_streams('subtitles')
+            },
         }
 
 
-class CrunchyrollBetaShowIE(CrunchyrollBaseIE):
+class CrunchyrollBetaShowIE(CrunchyrollBetaBaseIE):
     IE_NAME = 'crunchyroll:playlist:beta'
-    _VALID_URL = r'https?://beta\.crunchyroll\.com/(?P<lang>(?:\w{1,2}/)?)series/\w+/(?P<id>[\w\-]+)/?(?:\?|$)'
+    _VALID_URL = r'''(?x)
+        https?://beta\.crunchyroll\.com/
+        (?P<lang>(?:\w{2}(?:-\w{2})?/)?)
+        series/(?P<id>\w+)
+        (?:/(?P<display_id>[\w-]+))?/?(?:[?#]|$)'''
     _TESTS = [{
         'url': 'https://beta.crunchyroll.com/series/GY19NQ2QR/Girl-Friend-BETA',
         'info_dict': {
-            'id': 'girl-friend-beta',
+            'id': 'GY19NQ2QR',
             'title': 'Girl Friend BETA',
         },
         'playlist_mincount': 10,
     }, {
-        'url': 'https://beta.crunchyroll.com/it/series/GY19NQ2QR/Girl-Friend-BETA',
+        'url': 'https://beta.crunchyroll.com/it/series/GY19NQ2QR',
         'only_matching': True,
     }]
 
     def _real_extract(self, url):
-        lang, series_id = self._match_valid_url(url).group('lang', 'id')
-        return self.url_result(f'https://www.crunchyroll.com/{lang}{series_id.lower()}',
-                               CrunchyrollShowPlaylistIE.ie_key(), series_id)
+        lang, internal_id, display_id = self._match_valid_url(url).group('lang', 'id', 'display_id')
+        api_domain, bucket, params = self._get_params(lang)
+
+        series_response = self._download_json(
+            f'{api_domain}/cms/v2{bucket}/series/{internal_id}', display_id,
+            note='Retrieving series metadata', query=params)
+
+        seasons_response = self._download_json(
+            f'{api_domain}/cms/v2{bucket}/seasons?series_id={internal_id}', display_id,
+            note='Retrieving season list', query=params)
+
+        def entries():
+            for season in seasons_response['items']:
+                episodes_response = self._download_json(
+                    f'{api_domain}/cms/v2{bucket}/episodes?season_id={season["id"]}', display_id,
+                    note=f'Retrieving episode list for {season.get("slug_title")}', query=params)
+                for episode in episodes_response['items']:
+                    episode_id = episode['id']
+                    episode_display_id = episode['slug_title']
+                    yield {
+                        '_type': 'url',
+                        'url': f'https://beta.crunchyroll.com/{lang}watch/{episode_id}/{episode_display_id}',
+                        'ie_key': CrunchyrollBetaIE.ie_key(),
+                        'id': episode_id,
+                        'title': '%s Episode %s – %s' % (episode.get('season_title'), episode.get('episode'), episode.get('title')),
+                        'description': try_get(episode, lambda x: x['description'].replace(r'\r\n', '\n')),
+                        'duration': float_or_none(episode.get('duration_ms'), 1000),
+                        'series': episode.get('series_title'),
+                        'series_id': episode.get('series_id'),
+                        'season': episode.get('season_title'),
+                        'season_id': episode.get('season_id'),
+                        'season_number': episode.get('season_number'),
+                        'episode': episode.get('title'),
+                        'episode_number': episode.get('sequence_number')
+                    }
+
+        return self.playlist_result(entries(), internal_id, series_response.get('title'))

@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -10,6 +7,7 @@ from ..utils import (
     js_to_json,
     sanitized_Request,
     urlencode_postdata,
+    traverse_obj,
 )
 
 
@@ -54,10 +52,7 @@ class TubiTvIE(InfoExtractor):
         },
     }]
 
-    def _login(self):
-        username, password = self._get_login_info()
-        if username is None:
-            return
+    def _perform_login(self, username, password):
         self.report_login()
         form_data = {
             'username': username,
@@ -72,22 +67,20 @@ class TubiTvIE(InfoExtractor):
             raise ExtractorError(
                 'Login failed (invalid username/password)', expected=True)
 
-    def _real_initialize(self):
-        self._login()
-
     def _real_extract(self, url):
         video_id = self._match_id(url)
         video_data = self._download_json(
-            'http://tubitv.com/oz/videos/%s/content' % video_id, video_id)
+            'https://tubitv.com/oz/videos/%s/content?video_resources=dash&video_resources=hlsv3&video_resources=hlsv6' % video_id, video_id)
         title = video_data['title']
 
         formats = []
-        url = video_data['url']
-        # URL can be sometimes empty. Does this only happen when there is DRM?
-        if url:
-            formats = self._extract_m3u8_formats(
-                self._proto_relative_url(url),
-                video_id, 'mp4', 'm3u8_native')
+
+        for resource in video_data['video_resources']:
+            if resource['type'] in ('dash', ):
+                formats += self._extract_mpd_formats(resource['manifest']['url'], video_id, mpd_id=resource['type'], fatal=False)
+            elif resource['type'] in ('hlsv3', 'hlsv6'):
+                formats += self._extract_m3u8_formats(resource['manifest']['url'], video_id, 'mp4', m3u8_id=resource['type'], fatal=False)
+
         self._sort_formats(formats)
 
         thumbnails = []
@@ -107,6 +100,9 @@ class TubiTvIE(InfoExtractor):
                 'url': self._proto_relative_url(sub_url),
             })
 
+        season_number, episode_number, episode_title = self._search_regex(
+            r'^S(\d+):E(\d+) - (.+)', title, 'episode info', fatal=False, group=(1, 2, 3), default=(None, None, None))
+
         return {
             'id': video_id,
             'title': title,
@@ -117,6 +113,9 @@ class TubiTvIE(InfoExtractor):
             'duration': int_or_none(video_data.get('duration')),
             'uploader_id': video_data.get('publisher_id'),
             'release_year': int_or_none(video_data.get('year')),
+            'season_number': int_or_none(season_number),
+            'episode_number': int_or_none(episode_number),
+            'episode_title': episode_title
         }
 
 
@@ -132,10 +131,14 @@ class TubiTvShowIE(InfoExtractor):
 
     def _entries(self, show_url, show_name):
         show_webpage = self._download_webpage(show_url, show_name)
+
         show_json = self._parse_json(self._search_regex(
-            r"window\.__data\s*=\s*({.+?});\s*</script>",
-            show_webpage, 'data',), show_name, transform_source=js_to_json)['video']
+            r'window\.__data\s*=\s*({[^<]+});\s*</script>',
+            show_webpage, 'data'), show_name, transform_source=js_to_json)['video']
+
         for episode_id in show_json['fullContentById'].keys():
+            if traverse_obj(show_json, ('byId', episode_id, 'type')) == 's':
+                continue
             yield self.url_result(
                 'tubitv:%s' % episode_id,
                 ie=TubiTvIE.ie_key(), video_id=episode_id)
