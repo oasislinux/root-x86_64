@@ -43,9 +43,9 @@ xkb_symbols "basic" {
     key <AC09> {  [     Arabic_meem,                slash,                  NoSymbol,            NoSymbol ]};  // ‎م‎ /
     key <AC10> {  [      Arabic_kaf,                colon,                Arabic_gaf,            NoSymbol ]};  // ‎ك‎ :     ‎گ‎
     key <AC11> {  [      Arabic_tah,             quotedbl,                     U27E9,               U200D ]};  // ‎ط‎ "     ⟩ ZWJ
-    key <BKSL> {  [       backslash,             ellipsis,                     U27E8,               U202F ]};  // \ …     ⟨ NNBSP
+    key <BKSL> {  [       backslash,                  bar,                     U27E8,               U202F ]};  // \ |     ⟨ NNBSP
 
-    key <LSGT> {  [             bar,            brokenbar,                  NoSymbol,            NoSymbol ]};  // | ¦ 
+    key <LSGT> {  [             bar,             ellipsis,                 brokenbar,            NoSymbol ]};  // | …     ¦
     key <AB01> { [Arabic_hamzaonyeh,           asciitilde,            guillemotright,               U203A ]};  // ‎ئ‎ ~     » ›
     key <AB02> {  [    Arabic_hamza,         Arabic_sukun,             guillemotleft,               U2039 ]};  // ‎ء‎ ◌ْ     « ‹
     key <AB03> { [Arabic_hamzaonwaw,           braceright,                  NoSymbol,            NoSymbol ]};  // ‎ؤ }
@@ -391,9 +391,9 @@ xkb_symbols "basic_ext" {
     key <AC09> {  [     Arabic_meem,                slash,                     U06B3,               U06B1 ]};  // ‎م‎ /     ‎ڳ‎ ‎ڱ‎
     key <AC10> {  [      Arabic_kaf,                colon,                Arabic_gaf,        Arabic_keheh ]};  // ‎ك‎ :     ‎گ‎ ‎ک‎
     key <AC11> {  [      Arabic_tah,             quotedbl,                     U27E9,               U200D ]};  // ‎ط‎ "     ⟩ ZWJ
-    key <BKSL> {  [       backslash,             ellipsis,                     U27E8,               U202F ]};  // \ …     ⟨ NNBSP
+    key <BKSL> {  [       backslash,                  bar,                     U27E8,               U202F ]};  // \ |     ⟨ NNBSP
 
-    key <LSGT> {  [             bar,            brokenbar,                     U06C0,               U0620 ]};  // | ¦     ‎ۀ‎ ‎ؠ‎
+    key <LSGT> {  [             bar,             ellipsis,                     U06C0,               U0620 ]};  // | …     ‎ۀ‎ ‎ؠ‎
     key <AB01> { [Arabic_hamzaonyeh,           asciitilde,            guillemotright,               U203A ]};  // ‎ئ‎ ~     » ›
     key <AB02> {  [    Arabic_hamza,         Arabic_sukun,             guillemotleft,               U2039 ]};  // ‎ء‎ ◌ْ     « ‹
     key <AB03> { [Arabic_hamzaonwaw,           braceright,                     U06C7,               U0677 ]};  // ‎ؤ }     ‎ۇ‎ ‎ٷ‎
@@ -502,7 +502,7 @@ xkb_symbols "uga" {
     key <AC09> { [   U1038E,      slash          ]};  // 𐎎 /
     key <AC10> { [   U1038B,      colon          ]};  // 𐎋:
     key <AC11> { [   U10389,      quotedbl       ]};  // 𐎉  "
-    key <BKSL> { [backslash,      ellipsis       ]};  // \ …
+    key <BKSL> { [backslash,      bar            ]};  // \ |
 
     key <LSGT> { [      bar,      endash         ]};  // | –
     key <AB01> { [   U1039B,      guillemotleft  ]};  // 𐎛 «
@@ -515,4 +515,44 @@ xkb_symbols "uga" {
     key <AB08> { [   U10386,      comma          ]};  // 𐎆 ,
     key <AB09> { [   U10387,      period         ]};  // 𐎇 .
     key <AB10> { [   U10391,      periodcentered ]};  // 𐎑 ·
+};
+
+// An Ergonomic implementation of the basic Arabic keyboard (PC). Brings all letters to the middle 30 keys. 
+xkb_symbols "ergoarabic" {
+    include "ara(basic)"
+    name[Group1]= "Arabic (ErgoArabic)";
+    
+    key <TLDE> {  [           grave,           asciitilde,                  NoSymbol,            NoSymbol ]}; 
+
+    key <AD01> {  [        Arabic_dal,           Arabic_thal,               NoSymbol,               U2066 ]}; 
+    key <AD02> {  [        Arabic_sad,            Arabic_dad,               NoSymbol,               U2067 ]}; 
+    key <AD05> {  [        Arabic_feh,         Arabic_shadda,             Arabic_veh,            NoSymbol ]}; 
+    key <AD06> {  [      Arabic_hamza, Arabic_hamzaunderalef,               NoSymbol,               U202A ]}; 
+    key <AD07> {  [        Arabic_ain,          Arabic_ghain,               NoSymbol,               U202B ]}; 
+    key <AD08> {  [         Arabic_ha,              division,               NoSymbol,               U202C ]}; 
+    key <AD09> {  [        Arabic_waw,     Arabic_hamzaonwaw,               NoSymbol,            NoSymbol ]}; 
+    key <AD10> {  [ Arabic_tehmarbuta,      Arabic_semicolon,               NoSymbol,               U200E ]}; 
+    key <AD11> {  [      bracketright,            braceright,               NoSymbol,               U200F ]}; 
+    key <AD12> {  [       bracketleft,             braceleft,               NoSymbol,               U061C ]}; 
+
+    key <AC03> {  [        Arabic_yeh,          Arabic_fatha,               NoSymbol,            NoSymbol ]}; 
+    key <AC04> {  [        Arabic_beh,       Arabic_fathatan,             Arabic_peh,            NoSymbol ]}; 
+    key <AC05> {  [        Arabic_lam,    Arabic_maddaonalef,Arabic_superscript_alef,            NoSymbol ]}; 
+    key <AC07> {  [        Arabic_teh,        Arabic_tatweel,               NoSymbol,            NoSymbol ]}; 
+    key <AC08> {  [       Arabic_noon,              multiply,                  U066B,            NoSymbol ]}; 
+    key <AC09> {  [       Arabic_meem,                 comma,               NoSymbol,            NoSymbol ]}; 
+    key <AC10> {  [        Arabic_kaf,                 colon,             Arabic_gaf,            NoSymbol ]}; 
+    key <AC11> {  [        apostrophe,              quotedbl,                  U27E9,               U200D ]}; 
+    key <BKSL> {  [         backslash,                   bar,                  U27E8,               U202F ]}; 
+
+    key <AB01> {  [ Arabic_hamzaonyeh,              NoSymbol,                  U203A,            NoSymbol ]}; 
+    key <AB02> {  [Arabic_alefmaksura,          Arabic_sukun,                  U2039,            NoSymbol ]}; 
+    key <AB03> {  [        Arabic_tah,            Arabic_zah,               NoSymbol,            NoSymbol ]}; 
+    key <AB04> {  [         Arabic_ra,           Arabic_zain,             Arabic_jeh,            NoSymbol ]}; 
+    key <AB05> {  [       Arabic_khah,              ellipsis,               NoSymbol,            NoSymbol ]}; 
+    key <AB06> {  [        Arabic_hah,        guillemotright,               NoSymbol,            NoSymbol ]}; 
+    key <AB07> {  [       Arabic_jeem,         guillemotleft,           Arabic_tcheh,            NoSymbol ]}; 
+    key <AB08> {  [      Arabic_comma,               greater,               NoSymbol,            NoSymbol ]}; 
+    key <AB09> {  [            period,                  less,               NoSymbol,            NoSymbol ]}; 
+    key <AB10> {  [             slash,  Arabic_question_mark,                  U066D,               U200C ]}; 
 };

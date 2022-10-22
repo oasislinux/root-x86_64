@@ -5,6 +5,7 @@ xkb_symbols "basic" {
 
     name[Group1]="French";
 
+    key <TLDE>	{ [twosuperior, asciitilde,     notsign,      notsign ]	};
     key <AE01>	{ [ ampersand,          1,  onesuperior,   exclamdown ]	};
     key <AE02>	{ [    eacute,          2,   asciitilde,    oneeighth ]	};
     key <AE03>	{ [  quotedbl,          3,   numbersign,     sterling ]	};
@@ -27,12 +28,11 @@ xkb_symbols "basic" {
     key <AC01>	{ [         q,          Q,           at,  Greek_OMEGA ]	};
     key <AC10>	{ [         m,          M,           mu,    masculine ]	};
     key <AC11>	{ [    ugrave,    percent, dead_circumflex, dead_caron]	};
-    key <TLDE>	{ [twosuperior, asciitilde,     notsign,      notsign ]	};
-
     key <BKSL>	{ [  asterisk,         mu,   dead_grave,   dead_breve ]	};
+
     key <AB01>	{ [         w,          W,      lstroke,      Lstroke ]	};
     key <AB07>	{ [     comma,   question,   dead_acute, dead_doubleacute ] };
-    key <AB08>	{ [ semicolon,     period, horizconnector,   multiply ]	};
+    key <AB08>	{ [ semicolon,     period,        U2022,     multiply ]	}; // bullet
     key <AB09>	{ [     colon,      slash, periodcentered,   division ]	};
     key <AB10>	{ [    exclam,    section, dead_belowdot, dead_abovedot ] };
 
@@ -41,6 +41,9 @@ xkb_symbols "basic" {
 
 partial alphanumeric_keys
 xkb_symbols "olpc" {
+
+    // #HW-SPECIFIC
+
     // Contact: Sayamindu Dasgupta <sayamindu@laptop.org>
     include "fr(basic)"
 
@@ -736,7 +739,7 @@ xkb_symbols "bre" {
 
     include "keypad(oss)"
 
-    name[Group1]= "French (Breton)";
+    name[Group1]= "Breton (France)";
 
     // First row
     key <TLDE> { [     twosuperior,     dead_tilde,   dead_abovedot,    Greek_GAMMA ] };
@@ -1014,19 +1017,8 @@ xkb_symbols "us" {
 
 
     key <TLDE> { [     grave, asciitilde,    dead_grave                   ] };
+    key <AE04> { [         4,     dollar,      EuroSign,         currency ] }; // € ¤
     key <AE06> { [         6,asciicircum,dead_circumflex                  ] };
-
-    key <AB01> { [	   z,          Z,   acircumflex,      Acircumflex ] }; // â Â
-    key <AB03> { [	   c,          C,      ccedilla,         Ccedilla ] }; // ç Ç
-
-    key <AC01> { [	   a,          A,        agrave,           Agrave ] }; // à À
-    key <AC02> { [	   s,          S,            ae,               AE ] }; // æ Æ
-    key <AC03> { [	   d,          D,   ecircumflex,      Ecircumflex ] }; // ê Ê
-    key <AC04> { [	   f,          F,    ediaeresis,       Ediaeresis ] }; // ë Ë
-    key <AC06> { [	   h,          H,    udiaeresis,       Udiaeresis ] }; // ü Ü
-    key <AC07> { [	   j,          J,   ucircumflex,      Ucircumflex ] }; // û Û
-    key <AC08> { [	   k,          K,   icircumflex,      Icircumflex ] }; // î Î
-    key <AC11> { [apostrophe,   quotedbl,dead_diaeresis,           degree ] };
 
     key <AD03> { [	   e,          E,        eacute,           Eacute ] }; // é É
     key <AD04> { [	   r,          R,        egrave,           Egrave ] }; // è È
@@ -1038,7 +1030,17 @@ xkb_symbols "us" {
     key <AD11> { [ bracketleft,  braceleft,  guillemotleft,  leftdoublequotemark ] }; // « “
     key <AD12> { [bracketright, braceright, guillemotright, rightdoublequotemark ] }; // » ”
 
-    key <AE04> { [        4,     dollar,      EuroSign,         currency ] }; // € ¤
+    key <AC01> { [	   a,          A,        agrave,           Agrave ] }; // à À
+    key <AC02> { [	   s,          S,            ae,               AE ] }; // æ Æ
+    key <AC03> { [	   d,          D,   ecircumflex,      Ecircumflex ] }; // ê Ê
+    key <AC04> { [	   f,          F,    ediaeresis,       Ediaeresis ] }; // ë Ë
+    key <AC06> { [	   h,          H,    udiaeresis,       Udiaeresis ] }; // ü Ü
+    key <AC07> { [	   j,          J,   ucircumflex,      Ucircumflex ] }; // û Û
+    key <AC08> { [	   k,          K,   icircumflex,      Icircumflex ] }; // î Î
+    key <AC11> { [apostrophe,   quotedbl,dead_diaeresis,           degree ] };
+
+    key <AB01> { [	   z,          Z,   acircumflex,      Acircumflex ] }; // â Â
+    key <AB03> { [	   c,          C,      ccedilla,         Ccedilla ] }; // ç Ç
 
     include "level3(ralt_switch)"
     include "eurosign(5)"
@@ -1147,19 +1149,19 @@ xkb_symbols "us-alt" {
     include "us(basic)"
     name[Group1]= "French (US with dead keys, alt.)";
 
-    key <AB03> { [         c,          C,      ccedilla,         Ccedilla ] }; // ç Ç
-
-    key <AC01> { [         a,          A,            ae,               AE ] }; // æ Æ
-    key <AC11> { [dead_diaeresis, quotedbl,  apostrophe ] };
+    key <TLDE> { [dead_grave, asciitilde,         grave ] };
+    key <AE04> { [         4,     dollar,      EuroSign,         currency ] }; // € ¤
+    key <AE06> { [dead_circumflex, asciicircum,       6 ] };
 
     key <AD03> { [         e,          E,        eacute,           Eacute ] }; // é É
     key <AD09> { [         o,          O,            oe,               OE ] }; // œ Œ
     key <AD11> { [ bracketleft,  braceleft,  guillemotleft,  leftdoublequotemark ] }; // « “
     key <AD12> { [bracketright, braceright, guillemotright, rightdoublequotemark ] }; // » ”
 
-    key <TLDE> { [dead_grave, asciitilde,         grave ] };
-    key <AE06> { [dead_circumflex, asciicircum,       6 ] };
-    key <AE04> { [         4,     dollar,      EuroSign,         currency ] }; // € ¤
+    key <AC01> { [         a,          A,            ae,               AE ] }; // æ Æ
+    key <AC11> { [dead_diaeresis, quotedbl,  apostrophe ] };
+
+    key <AB03> { [         c,          C,      ccedilla,         Ccedilla ] }; // ç Ç
 
     include "level3(ralt_switch)"
     include "eurosign(5)"
@@ -1175,19 +1177,6 @@ xkb_symbols "us-azerty" {
     include "us"
     name[Group1]= "French (US, AZERTY)";
 
-    key <AB01> { [         w,          W, guillemotleft, leftdoublequotemark ] }; // « “
-    key <AB02> { [         x,          X,guillemotright,rightdoublequotemark ] }; // » ”
-    key <AB07> { [ semicolon,      colon                                  ] };
-
-    key <AC01> { [         q,          Q                                  ] };
-    key <AC10> { [         m,          M                                  ] };
-    key <AC11> { [apostrophe,   quotedbl,        ugrave,           Ugrave ] }; // ù Ù
-
-    key <AD01> { [         a,          A,            ae,               AE ] }; // æ Æ
-    key <AD02> { [         z,          Z                                  ] };
-    key <AD09> { [         o,          O,            oe,               OE ] }; // œ Œ
-    key <AD11> { [bracketleft, braceleft,dead_circumflex,  dead_diaeresis ] };
-
     key <TLDE> { [     grave, asciitilde,    dead_grave                   ] };
     key <AE02> { [         2,         at,        eacute,           Eacute ] }; // é É
     key <AE04> { [         4,     dollar,      currency                   ] }; // ¤
@@ -1195,6 +1184,19 @@ xkb_symbols "us-azerty" {
     key <AE07> { [         7,  ampersand,        egrave,           Egrave ] }; // è È
     key <AE09> { [         9,  parenleft,      ccedilla,         Ccedilla ] }; // ç Ç
     key <AE10> { [         0, parenright,        agrave,           Agrave ] }; // à À
+
+    key <AD01> { [         a,          A,            ae,               AE ] }; // æ Æ
+    key <AD02> { [         z,          Z                                  ] };
+    key <AD09> { [         o,          O,            oe,               OE ] }; // œ Œ
+    key <AD11> { [bracketleft, braceleft,dead_circumflex,  dead_diaeresis ] };
+
+    key <AC01> { [         q,          Q                                  ] };
+    key <AC10> { [         m,          M                                  ] };
+    key <AC11> { [apostrophe,   quotedbl,        ugrave,           Ugrave ] }; // ù Ù
+
+    key <AB01> { [         w,          W, guillemotleft, leftdoublequotemark ] }; // « “
+    key <AB02> { [         x,          X,guillemotright,rightdoublequotemark ] }; // » ”
+    key <AB07> { [ semicolon,      colon                                  ] };
 
     include "eurosign(e)"
     include "level3(ralt_switch)"

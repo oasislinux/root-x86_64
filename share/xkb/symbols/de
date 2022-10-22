@@ -1,3 +1,5 @@
+// Keyboard layouts for Germany.
+
 default
 xkb_symbols "basic" {
 
@@ -5,35 +7,30 @@ xkb_symbols "basic" {
 
     name[Group1]="German";
 
-    key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};
-    key <AE03>	{ [         3,    section, threesuperior,    sterling ]	};
-    key <AE04>	{ [         4,     dollar,   onequarter,     currency ]	};
+    key <TLDE>	{[dead_circumflex, degree,            U2032,          U2033 ]}; // ′ ″
+    key <AE02>	{[          2,   quotedbl,      twosuperior,      oneeighth ]};
+    key <AE03>	{[          3,    section,    threesuperior,       sterling ]};
+    key <AE04>	{[          4,     dollar,       onequarter,       currency ]};
+    key <AE11>	{[     ssharp,   question,        backslash,   questiondown,    U1E9E ], type[group1]="FOUR_LEVEL_PLUS_LOCK" };
+    key <AE12>	{[ dead_acute, dead_grave,     dead_cedilla,    dead_ogonek ]};
 
-    key <AE11> {type[Group1]="FOUR_LEVEL_PLUS_LOCK",  symbols[Group1]=
-                  [ssharp, question, backslash, questiondown, 0x1001E9E ]};
-    key <AE12>	{ [dead_acute, dead_grave, dead_cedilla,  dead_ogonek ]	};
+    key <AD03>	{[          e,          E,         EuroSign,       EuroSign ]};
+    key <AD06>	{[          z,          Z,        leftarrow,            yen ]};
+    key <AD11>	{[ udiaeresis, Udiaeresis,   dead_diaeresis, dead_abovering ]};
+    key <AD12>	{[       plus,   asterisk,       asciitilde,         macron ]};
 
-    key <AD03>	{ [         e,          E,     EuroSign,     EuroSign ]	};
-    key <AD06>	{ [         z,          Z,    leftarrow,          yen ]	};
-    key <AD11>	{ [udiaeresis, Udiaeresis, dead_diaeresis, dead_abovering ] };
-    key <AD12>	{ [      plus,   asterisk,   asciitilde,  macron ]	};
+    key <AC02>	{[          s,          S,            U017F,          U1E9E ]}; // ſ ẞ
+    key <AC07>	{[          j,          J,    dead_belowdot,  dead_abovedot ]};
+    key <AC10>	{[ odiaeresis, Odiaeresis, dead_doubleacute,  dead_belowdot ]};
+    key <AC11>	{[ adiaeresis, Adiaeresis,  dead_circumflex,     dead_caron ]};
+    key <BKSL>	{[ numbersign, apostrophe, rightsinglequotemark, dead_breve ]};
 
-    key <AC02>  { [         s,          S,                U017F,     U1E9E    ] };
-    key <AC07>  { [         j,          J,        dead_belowdot, dead_abovedot   ] };
-    key <AC10>	{ [odiaeresis, Odiaeresis, dead_doubleacute, dead_belowdot ] };
-    key <AC11>	{ [adiaeresis, Adiaeresis, dead_circumflex, dead_caron ] };
-    key <TLDE>	{ [dead_circumflex, degree,	U2032,    U2033	] };
-
-    key <BKSL>	{ [numbersign, apostrophe, rightsinglequotemark,   dead_breve ]	};
-    key <AB01>	{ [         y,          Y,       guillemotright,    U203A 	] };
-    key <AB02>	{ [         x,          X,        guillemotleft,    U2039 	] };
-    key <AB04>	{ [         v,          V,   doublelowquotemark, singlelowquotemark ]	};
-    key <AB05>	{ [         b,          B,  leftdoublequotemark, leftsinglequotemark ] };
-    key <AB06>	{ [         n,          N, rightdoublequotemark, rightsinglequotemark ]	};
-    key <AB08>  { [     comma,  semicolon,       periodcentered,     multiply	] };
-    key <AB09>	{ [    period,      colon,                U2026,     division 	] };
-    key <AB10>	{ [     minus, underscore,               endash,     emdash	] };
-    key <LSGT>	{ [     less,     greater,                  bar, dead_belowmacron ] };
+    key <LSGT>	{[      less,     greater,            bar, dead_belowmacron ]};
+    key <AB01>	{[          y,          Y,   guillemotright,          U203A ]}; // » ›
+    key <AB02>	{[          x,          X,    guillemotleft,          U2039 ]}; // « ‹
+    key <AB08>	{[      comma,  semicolon,   periodcentered,       multiply ]};
+    key <AB09>	{[     period,      colon,            U2026,       division ]}; // … ÷
+    key <AB10>	{[      minus, underscore,           endash,         emdash ]};
 
     include "kpdl(comma)"
 
@@ -107,8 +104,8 @@ xkb_symbols "e1" {
     key.type[Group1] = "EIGHT_LEVEL";
     key <TLDE> { [ dead_circumflex,     degree,             multiply, NoSymbol,             NoSymbol,             NoSymbol, NoSymbol, NoSymbol ] };
     key <AE01> { [               1,     exclam, rightsinglequotemark, NoSymbol,           onequarter,                U25CA, NoSymbol, NoSymbol ] };
-    key <AE02> { [               2,   quotedbl,          twosuperior, NoSymbol,              onehalf,                U00A6, NoSymbol, NoSymbol ] };
-    key <AE03> { [               3,    section,        threesuperior, NoSymbol,        threequarters,                U00B6, NoSymbol, NoSymbol ] };
+    key <AE02> { [               2,   quotedbl,          twosuperior, NoSymbol,              onehalf,            brokenbar, NoSymbol, NoSymbol ] };
+    key <AE03> { [               3,    section,        threesuperior, NoSymbol,        threequarters,            paragraph, NoSymbol, NoSymbol ] };
     key <AE04> { [               4,     dollar,               emdash, NoSymbol,             currency,                U2133, NoSymbol, NoSymbol ] };
     key <AE05> { [               5,    percent,           exclamdown, NoSymbol,                U2030,                U20B0, NoSymbol, NoSymbol ] };
     key <AE06> { [               6,  ampersand,         questiondown, NoSymbol,                U2044,                U204A, NoSymbol, NoSymbol ] };
@@ -116,7 +113,7 @@ xkb_symbols "e1" {
     key <AE08> { [               8,  parenleft,          bracketleft, NoSymbol,                U27E8,                U27EA, NoSymbol, NoSymbol ] };
     key <AE09> { [               9, parenright,         bracketright, NoSymbol,                U27E9,                U27EB, NoSymbol, NoSymbol ] };
     key <AE10> { [               0,      equal,           braceright, NoSymbol,             division,                U2205, NoSymbol, NoSymbol ] };
-    key <AE11> { [          ssharp,   question,            backslash, NoSymbol,             notequal,                U00AC, NoSymbol, NoSymbol ] };
+    key <AE11> { [          ssharp,   question,            backslash, NoSymbol,             notequal,              notsign, NoSymbol, NoSymbol ] };
     key <AE12> { [      dead_acute, dead_grave,        dead_abovedot, NoSymbol,             sterling,                U035C, NoSymbol, NoSymbol ] };
 
     // second row
@@ -200,8 +197,8 @@ xkb_symbols "e2" {
     // one key less: assign bar, less and greater to other keys
     key.type[Group1] = "EIGHT_LEVEL";
     key <TLDE> { [ dead_circumflex,   degree,        bar, NoSymbol,      NoSymbol, NoSymbol, NoSymbol, NoSymbol ] };
-    key <AE02> { [               2, quotedbl,       less, NoSymbol,       onehalf,    U00A6, NoSymbol, NoSymbol ] };
-    key <AE03> { [               3,  section,    greater, NoSymbol, threequarters,    U00B6, NoSymbol, NoSymbol ] };
+    key <AE02> { [               2, quotedbl,       less, NoSymbol,       onehalf,brokenbar, NoSymbol, NoSymbol ] };
+    key <AE03> { [               3,  section,    greater, NoSymbol, threequarters,paragraph, NoSymbol, NoSymbol ] };
     key <AD12> { [            plus, asterisk, asciitilde, NoSymbol,      multiply,    U2052, NoSymbol, NoSymbol ] };
 
     // if E2 is used on a 105-key keyboard
@@ -367,15 +364,13 @@ xkb_symbols "dvorak" {
     key <AC09> { [ n, N, nacute, Nacute ] };
     key <AC10> { [ s, S, sacute, Sacute] };
     key <AC11> { [ l, L, lstroke, Lstroke ] };
+    key <BKSL> { [ minus, underscore, hyphen, diaeresis] };
 
+    key <LSGT> { [ adiaeresis, Adiaeresis, bar ] };
     key <AB01> { [ odiaeresis, Odiaeresis ] };
     key <AB02> { [ q, Q, at ] };
     key <AB07> { [ m, M, mu ] };
     key <AB10> { [ numbersign, apostrophe ] };
-
-    key <BKSL> { [ minus, underscore, hyphen, diaeresis] };
-
-    key <LSGT> { [ adiaeresis, Adiaeresis, bar ] };
 
     include "level3(ralt_switch)"
 };
@@ -385,51 +380,43 @@ xkb_symbols "dvorak" {
 // adopted 2004 by Hanno Behrens <Hanno.Behrens@gmx.de>
 // inspired by Dvorak/de-ergo  http://www.goebel-consult.de/de-ergo/
 //
-// Authors: 
-//      Stephan Hilb <stephan at ehilb dot de>
-//      <lucky at zankt dot net>
-//      Benjamin Kellermann <Benjamin dot Kellermann at gmx dot Germany>
-//      Erik Streb <mail at erikstreb dot de>
-//        and many other contributors
+// Authors:    Stephan Hilb <stephan at ehilb dot de>
+//             <lucky at zankt dot net>
+//             Benjamin Kellermann <Benjamin dot Kellermann at gmx dot Germany>
+//             Erik Streb <mail at erikstreb dot de>
+//             and many other contributors
 //
-//      http://www.neo-layout.org
-//
-// $Revision$, $Date$
+// https://www.neo-layout.org
 
 partial alphanumeric_keys modifier_keys keypad_keys
 xkb_symbols "neo_base" {
 
-    // Levels in Neo jargon
+    // The different layers and how to reach them
     // --------------------------------------------------------------
     // Ebene 1: normal
     // Ebene 2: Shift
-    // Ebene 3: Mod3
-    // Ebene 4: Mod4 (for marking something use Shift + Mod4)
-    // Ebene 5: Shift + Mod3
-    // Ebene 6: Mod3 + Mod4
-    // Compose (not a level): Mod3 + Tab
-    // Feststelltaste (Capslock): Shift + Shift
-    // Mod4-Lock: Mod4 + Mod4
-    // Mod4-Lock: Shift + Mod3 + Tab
+    // Ebene 3: Caps or Bksl ("Mod three")
+    // Ebene 4: Lsgt or RAlt ("Mod four")  (for selecting, use also Shift)
+    // Ebene 5: Shift + Caps/Bksl
+    // Ebene 6: Caps/Bksl + Lsgt/RAlt
+    // Locking uppercase: left Shift + right Shift
+    // Locking Ebene 4: Shift + Caps + Tab, or Lsgt + RAlt
 
-    // Legend
-    // ===============
-    // Levels in Xkbmap jargon to be found here in the definitions. 
-    // These are the levels used, and Xorg's translations:
+
+    // Captions for the large table below
     // --------------------------------------------------------------
-    // Xorg:       Level1                   Level2                   Level3                   Level4                   Level5                   Level6                   Level7                   Level8                   
-    // Neo:        Ebene1                   Ebene2                   Ebene3                   Ebene5                   Ebene4                   Pseudo-Ebene             Ebene6                   ???                      
-    // Keys (Neo): None                     Shift                    Mod3                     Mod3 + Shift             Mod4                     Mod4 + Shift             Mod3 + Mod4              Mod3 + Mod4 + Shift      
+    // Xorg:       Level1                   Level2                   Level3                   Level4                   Level5                   Level6                   Level7                   Level8
+    // Neo:        Ebene1                   Ebene2                   Ebene3                   Ebene5                   Ebene4                   Pseudo-Ebene             Ebene6
+    // Access key: none                     Shift                    Caps/Bksl                Shift + Caps/Bksl        Lsgt/RAlt                Shift + Lsgt/RAlt        Caps/Bksl + Lsgt/RAlt
 
 
     // Alphanumeric-keys
-    // ===============
+    // =================
     key.type[Group1] = "EIGHT_LEVEL_LEVEL_FIVE_LOCK";
 
-    // Tab as Multi_key (Compose)
+    // The Tab key has Compose on the third layer (Caps + Tab)
     // --------------------------------------------------------------
     key  <TAB> { [ Tab,                     ISO_Left_Tab,            Multi_key,               ISO_Level5_Lock,         NoSymbol,                NoSymbol,                NoSymbol,                ISO_Level5_Lock          ] };
-
 
     // Number row
     // --------------------------------------------------------------
@@ -502,15 +489,15 @@ xkb_symbols "neo_base" {
     key <AB09> { [ period,                  enfilledcircbullet,      apostrophe,              U03D1,                   KP_3,                    KP_3,                    U21A6,                   NoSymbol                 ] };
     key.type[Group1] = "EIGHT_LEVEL_ALPHABETIC_LEVEL_FIVE_LOCK";
     key <AB10> { [ j,                       J,                       semicolon,               Greek_theta,             semicolon,               NoSymbol,                Greek_THETA,             NoSymbol                 ] };
-    key.type[Group1] = "EIGHT_LEVEL_LEVEL_FIVE_LOCK";
 
     // Space key
     // --------------------------------------------------------------
+    key.type[Group1] = "EIGHT_LEVEL_LEVEL_FIVE_LOCK";
     key <SPCE> { [ space,                   space,                   space,                   nobreakspace,            KP_0,                    KP_0,                    U202F,                   NoSymbol                 ] };
 
 
     // Keypad-keys
-    // ===============
+    // ===========
 
     // The former Numlock key:
     key <NMLK> { [ Tab,                     ISO_Left_Tab,            equal,                   approxeq,                notequal,                Pointer_EnableKeys,      identical,               NoSymbol                 ] };
@@ -613,20 +600,21 @@ xkb_symbols "dsb"
 {
 	include "latin(basic)"
 	name[Group1] = "Lower Sorbian";
-	key <AB01> { [              z,              Z,         zcaron,         Zcaron ] };
-	key <AB02> { [              x,              X,         zacute,         Zacute ] };
-	key <AB03> { [              c,              C,         cacute,         Cacute ] };
-	key <AB04> { [              v,              V,         ccaron,         Ccaron ] };
-	key <AB06> { [              n,              N,         nacute,         Nacute ] };
-	key <AC02> { [              s,              S,         sacute,         Sacute ] };
-	key <AC03> { [              d,              D,         scaron,         Scaron ] };
-	key <AC04> { [              f,              F                                 ] };
-	key <AD01> { [              q,              Q                                 ] };
-	key <AD02> { [              w,              W                                 ] };
-	key <AD03> { [              e,              E,         ecaron,         Ecaron ] };
-	key <AD04> { [              r,              R,         racute,         Racute ] };
-	key <AD05> { [              t,              T,          U20B5,       EuroSign ] };
-	key <AD09> { [              o,              O,         oacute,         Oacute ] };
+
+	key <AD03> { [    e,    E,    ecaron,    Ecaron ] };
+	key <AD04> { [    r,    R,    racute,    Racute ] };
+	key <AD05> { [    t,    T,     U20B5,  EuroSign ] };
+	key <AD09> { [    o,    O,    oacute,    Oacute ] };
+
+	key <AC02> { [    s,    S,    sacute,    Sacute ] };
+	key <AC03> { [    d,    D,    scaron,    Scaron ] };
+
+	key <AB01> { [    z,    Z,    zcaron,    Zcaron ] };
+	key <AB02> { [    x,    X,    zacute,    Zacute ] };
+	key <AB03> { [    c,    C,    cacute,    Cacute ] };
+	key <AB04> { [    v,    V,    ccaron,    Ccaron ] };
+	key <AB06> { [    n,    N,    nacute,    Nacute ] };
+
 	include "kpdl(comma)"
 	include "level3(ralt_switch)"
 };
@@ -634,24 +622,23 @@ xkb_symbols "dsb"
 partial alphanumeric_keys
 xkb_symbols "dsb_qwertz"
 {
-	include "latin(basic)"
+	include "de(basic)"
 	name[Group1] = "Lower Sorbian (QWERTZ)";
-	key <AB01> { [              y,              Y                                 ] };
-	key <AB02> { [              x,              X                                 ] };
-	key <AB03> { [              c,              C,         cacute,         Cacute ] };
-	key <AB04> { [              v,              V,         ccaron,         Ccaron ] };
-	key <AB06> { [              n,              N,         nacute,         Nacute ] };
-	key <AC02> { [              s,              S,         sacute,         Sacute ] };
-	key <AC03> { [              d,              D,         scaron,         Scaron ] };
-	key <AC04> { [              f,              F                                 ] };
-	key <AD01> { [              q,              Q                                 ] };
-	key <AD02> { [              w,              W                                 ] };
-	key <AD03> { [              e,              E,         ecaron,         Ecaron ] };
-	key <AD04> { [              r,              R,         racute,         Racute ] };
-	key <AD05> { [              t,              T,          U20B5,       EuroSign ] };
-	key <AD06> { [              z,              Z,         zcaron,         Zcaron ] };
-	key <AD07> { [              u,              U,         zacute,         Zacute ] };
-	key <AD09> { [              o,              O,         oacute,         Oacute ] };
+
+	key <AD03> { [    e,    E,    ecaron,    Ecaron ] };
+	key <AD04> { [    r,    R,    racute,    Racute ] };
+	key <AD05> { [    t,    T,     U20B5,  EuroSign ] };
+	key <AD06> { [    z,    Z,    zcaron,    Zcaron ] };
+	key <AD07> { [    u,    U,    zacute,    Zacute ] };
+	key <AD09> { [    o,    O,    oacute,    Oacute ] };
+
+	key <AC02> { [    s,    S,    sacute,    Sacute ] };
+	key <AC03> { [    d,    D,    scaron,    Scaron ] };
+
+	key <AB03> { [    c,    C,    cacute,    Cacute ] };
+	key <AB04> { [    v,    V,    ccaron,    Ccaron ] };
+	key <AB06> { [    n,    N,    nacute,    Nacute ] };
+
 	include "kpdl(comma)"
 	include "level3(ralt_switch)"
 };

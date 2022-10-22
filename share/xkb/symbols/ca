@@ -343,7 +343,7 @@ xkb_symbols "multix" {
 
     key.type[group1]="EIGHT_LEVEL_SEMIALPHABETIC";
     key <AD01> {[         q,          Q,       NoSymbol, NoSymbol,       NoSymbol,   Greek_OMEGA ]};
-    key <AD02> {[         w,          W,       NoSymbol, NoSymbol,        lstroke,       Lstroke ]};
+    key <AD02> {[         w,          W,       NoSymbol, NoSymbol,        Lstroke,       lstroke ]};
     key <AD03> {[         e,          E,       NoSymbol, NoSymbol,             oe,            OE ]};
     key <AD04> {[         r,          R,       NoSymbol, NoSymbol,      paragraph,    registered ]};
     key <AD05> {[         t,          T,       NoSymbol, NoSymbol,         tslash,        Tslash ]};
@@ -360,7 +360,7 @@ xkb_symbols "multix" {
     key <AD12> {[  ccedilla,   Ccedilla,     asciitilde, NoSymbol,     dead_tilde,   dead_macron ]};
 
     key <AC01> {[         a,          A,       NoSymbol, NoSymbol,             ae,            AE ]};
-    key <AC02> {[         s,          S,       NoSymbol, NoSymbol,         ssharp,       section ]};
+    key <AC02> {[         s,          S,       NoSymbol, NoSymbol,         ssharp,         U1E9E ]};
     key <AC03> {[         d,          D,       NoSymbol, NoSymbol,            eth,           ETH ]};
     key <AC04> {[         f,          F,       NoSymbol, NoSymbol,       NoSymbol,   ordfeminine ]};
     key <AC05> {[         g,          G,       NoSymbol, NoSymbol,            eng,           ENG ]};
@@ -393,8 +393,6 @@ xkb_symbols "multix" {
     key <AB10> {[    eacute,     Eacute,     dead_acute, NoSymbol,       NoSymbol, dead_abovedot ]};
 
     include "nbsp(level3s)"
-
-    modifier_map Control{ Control_L };
 
     include "level3(ralt_switch)"
     include "level5(rctrl_switch)"
@@ -433,23 +431,14 @@ xkb_symbols "kut" {
 
     name[Group1]= "Kutenai";
 
-    // Alveolar Click
-    key <AD05> {	[ t,	T,U01C2	,U01C2	]	};
+    key <AD05> {[          t,        T,  U01C2,  U01C2  ]}; // alveolar click
 
-    //Cent sign
-    key <AB03> {	[ c,	C,U00A2,U00A2	]	};
+    key <AB03> {[          c,        C,  cent,   cent   ]};
+    key <AB09> {[     period,  greater,  periodcentered ]};
+    key <AB10> {[      slash, question,  U0294          ]}; // glottal stop
 
-    //Mid dot
-    key <AB09> {	[ period,     greater,U00B7   	]	};
-
-    //Glottal stop
-    key <AB10> {	[ slash,	question, U0294	]	};
-
-    //COMBINING COMMA ABOVE RIGHT
-    key <AC11> {	[ apostrophe,	quotedbl, U0315,U0315	]	};
-
-    //MODIFIER LETTER RIGHT HALF RING
-    key <AC10> {	[ semicolon,	colon,U02BE,U02BE	]	};
+    key <AC10> {[  semicolon,    colon,  U02BE,  U02BE  ]}; // MODIFIER LETTER RIGHT HALF RING
+    key <AC11> {[ apostrophe, quotedbl,  U0315,  U0315  ]}; // COMBINING COMMA ABOVE RIGHT
 };
 
 // Secwepemctsin keyboard for X11

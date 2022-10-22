@@ -81,11 +81,10 @@ default partial xkb_types "default" {
         level_name[Level4] = "Ctrl+Alt";
     };
 
-// A special type for keys used in the Serbian Latin Unicode keymap.
-// It makes it possible to use all three forms of latin letters
-// present in Unicode that are made up of two separate letters
-// (forms like LJ, Lj, and lj; NJ, Nj, and nj; etcetera).
-
+    // A special type for keys used in the Serbian Latin Unicode keymap.
+    // It makes it possible to use all three forms of latin letters
+    // present in Unicode that are made up of two separate letters
+    // (forms like LJ, Lj, and lj; NJ, Nj, and nj; etcetera).
     type "SEPARATE_CAPS_AND_SHIFT_ALPHABETIC" {
         modifiers = Shift+Lock+LevelThree;
         map[None] = Level1;
@@ -103,28 +102,16 @@ default partial xkb_types "default" {
         level_name[Level4] = "Shift AltGr";
     };
 
-// A key type for the German ssharp (for example), which is capitalized as SS.
-// CHARACTERISTICS:
-// It is FOUR_LEVEL with the exception that the fifth level is mapped to the
-// Lock modifier.  If other modifiers are used, the Lock state is ignored.
-// DETAILS ABOUT GERMAN:
-// The capital form of ssharp (called sharp s) only exists for completely
-// capitalized text, not for words at the beginning of sentences nor for
-// nouns (nouns in German normally start with a captial letter).
-// The ssharp key, to the right of the zero key, takes this into account
-// and has a questionmark mapped to Shift-ssharp since normally no capital
-// version is needed.
-// When typing with active CapsLock, this key type is needed to
-// output two capital letters S because this is the only German key
-// whose capital letter is not the same as the one typed with Shift.
-
+    // Five levels: the normal four levels with Shift and LevelThree,
+    // plus a fifth level when CapsLock (and only CapsLock) is active
+    // -- CapsLock is ignored when Shift and/or LevelThree is held.
     type "FOUR_LEVEL_PLUS_LOCK" {
         modifiers = Shift+Lock+LevelThree;
         map[None] = Level1;
         map[Shift] = Level2;
         map[LevelThree] = Level3;
         map[Shift+LevelThree] = Level4;
-        map[Lock]  = Level5;
+        map[Lock] = Level5;
         map[Lock+Shift] = Level2;
         map[Lock+LevelThree] = Level3;
         map[Lock+Shift+LevelThree] = Level4;

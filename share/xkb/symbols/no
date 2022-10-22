@@ -9,22 +9,21 @@ xkb_symbols "basic" {
 
     name[Group1]="Norwegian";
 
-    key <AB09>	{ [    period,      colon,   ellipsis, periodcentered ]	};
-    key <AB10>	{ [     minus, underscore,       endash,       emdash ]	};
-    key <AD04>	{ [         r,          R,   registered,    trademark ]	};
-    key <AD10>	{ [         p,          P,     Greek_pi,     Greek_PI ]	};
+    key <TLDE>	{ [       bar,    section,    brokenbar,    paragraph ]	};
     key <AE05>	{ [         5,    percent,      onehalf,    0x1002030 ]	};
-
     key <AE11>	{ [      plus,   question,    plusminus, questiondown ]	};
     key <AE12>	{ [ backslash, dead_grave,   dead_acute,      notsign ]	};
 
+    key <AD04>	{ [         r,          R,   registered,    trademark ]	};
+    key <AD10>	{ [         p,          P,     Greek_pi,     Greek_PI ]	};
 
     key <AC10>	{ [    oslash,   Ooblique,   dead_acute, dead_doubleacute ] };
     key <AC11>	{ [        ae,         AE, dead_circumflex, dead_caron]	};
-    key <TLDE>	{ [       bar,    section,    brokenbar,    paragraph ]	};
-
     key <BKSL>	{ [apostrophe,   asterisk, dead_doubleacute, multiply ]	};
+
     key <LSGT>	{ [      less,    greater,      onehalf, threequarters]	};
+    key <AB09>	{ [    period,      colon,   ellipsis, periodcentered ]	};
+    key <AB10>	{ [     minus, underscore,       endash,       emdash ]	};
 
     include "nbsp(level3n)"
     include "keypad(ossmath)"
@@ -66,7 +65,6 @@ xkb_symbols "dvorak" {
     name[Group1]="Norwegian (Dvorak)";
 
     key <TLDE> { [	  bar,	section, brokenbar, paragraph	] };
-
     key <AE01> { [	    1,	exclam, exclamdown, onesuperior	] };
     key <AE02> { [	    2,	quotedbl,   at,     twosuperior	] };
     key <AE03> { [	    3,	numbersign, sterling, threesuperior ] };
@@ -96,15 +94,14 @@ xkb_symbols "dvorak" {
     key <AC06> { [	    d,	D,      eth,		ETH	 ] };
     key <AC10> { [	    s,	S,      ssharp,		U1E9E	 ] };
     key <AC11> { [	minus,	underscore, hyphen,	diaeresis] };
+    key <BKSL> { [	 less,	greater, guillemotleft, guillemotright	] };
 
+    key <LSGT> { [	oslash,	Ooblique,  bar,	backslash	 ] };
     key <AB01> { [	   ae,	AE,     braceleft,	bracketleft] };
     key <AB05> { [	    x,	X,      multiply		 ] };
     key <AB07> { [	    m,	M,	mu			 ] };
-    key <BKSL> { [	 less,	greater, guillemotleft, guillemotright	] };
 
     key <SPCE> { [	 space,	space, nobreakspace, nobreakspace] };
-
-    key <LSGT> { [	oslash,	Ooblique,  bar,	backslash	 ] };
 
     // fixed https://bugs.freedesktop.org/show_bug.cgi?id=4397
     include "level3(ralt_switch)"
@@ -125,6 +122,7 @@ xkb_symbols "smi" {
 
     name[Group1]= "Northern Saami (Norway)";
 
+    key <TLDE>	{ [       bar,    section,    brokenbar,    paragraph ]	};
     key <AE01>	{ [         1,     exclam,    copyright,   exclamdown ]	};
     key <AE02>	{ [         2,   quotedbl,           at,   registered ]	};
     key <AE03>	{ [         3, numbersign,     sterling,         less ]	};
@@ -159,9 +157,10 @@ xkb_symbols "smi" {
     key <AC09>	{ [         l,          L,       degree,       hyphen ]	};
     key <AC10>	{ [    oslash,   Ooblique,   odiaeresis,   Odiaeresis ]	};
     key <AC11>	{ [        ae,         AE,   adiaeresis,   Adiaeresis ]	};
-    key <TLDE>	{ [       bar,    section,    brokenbar,    paragraph ]	};
-
     key <BKSL>	{ [   dstroke,    Dstroke,   apostrophe,     asterisk ]	};
+
+    key <LSGT>	{ type[Group1] = "FOUR_LEVEL",
+                  [    zcaron,     Zcaron,        U01EF,        U01EE ]	};
     key <AB01>	{ [         z,          Z,        U0292,        U01B7 ]	};
     key <AB02>	{ [    ccaron,     Ccaron,            x,            X ]	};
     key <AB03>	{ [         c,          C,     ccedilla,     Ccedilla ]	};
@@ -172,9 +171,6 @@ xkb_symbols "smi" {
     key <AB08>	{ [     comma,  semicolon, singlelowquotemark, doublelowquotemark ] };
     key <AB09>	{ [    period,      colon,     ellipsis, periodcentered ] };
     key <AB10>	{ [     minus, underscore,       endash,       emdash ]	};
-
-    key <LSGT>	{ type[Group1] = "FOUR_LEVEL",
-                  [    zcaron,     Zcaron,        U01EF,        U01EE ]	};
 
     include "level3(ralt_switch)"
 };
@@ -208,12 +204,14 @@ xkb_symbols "mac" {
     key <AE07>	{ [         7,      slash,          bar,    backslash ]	};
     key <AE08>	{ [         8,  parenleft,  bracketleft,    braceleft ]	};
     key <AE09>	{ [         9, parenright, bracketright,   braceright ]	};
-    key <AC10>	{ [    oslash,   Ooblique,   odiaeresis,   Odiaeresis ]	};
     key <AE11>	{ [      plus,   question     ]	};
-    key <AC11>	{ [        ae,         AE     ]	};
-    key <AD11>	{ [     aring,      Aring     ]	};
     key <AE12>	{ [ dead_grave, dead_acute,       acute,  dead_ogonek ]	};
+
+    key <AD11>	{ [     aring,      Aring     ]	};
     key <AD12>	{ [ diaeresis, asciicircum,  asciitilde,  dead_macron ]	};
+
+    key <AC10>	{ [    oslash,   Ooblique,   odiaeresis,   Odiaeresis ]	};
+    key <AC11>	{ [        ae,         AE     ]	};
     key <BKSL>	{ [        at,   asterisk     ]	};
 };
 
@@ -238,15 +236,6 @@ xkb_symbols "colemak" {
     include "no(basic)"
     name[Group1]= "Norwegian (Colemak)";
 
-    key <AB06>	{ [         k,          K,          kra,    ampersand ] };
-    key <AC02>	{ [         r,          R,   registered,    trademark ] };
-    key <AC03>	{ [         s,          S,       ssharp,      section ] };
-    key <AC04>	{ [         t,          T,        thorn,        THORN ] };
-    key <AC05>	{ [         d,          D,          eth,          ETH ] };
-    key <AC07>	{ [         n,          N ] };
-    key <AC08>	{ [         e,          E,     EuroSign,         cent ] };
-    key <AC09>	{ [         i,          I,   rightarrow,     idotless ] };
-    key <AC10>	{ [         o,          O,           oe,           OE ] };
     key <AD03>	{ [         f,          F,      dstroke,  ordfeminine ] };
     key <AD04>	{ [         p,          P,     Greek_pi,     Greek_PI ] };
     key <AD05>	{ [         g,          G,          eng,          ENG ] };
@@ -255,6 +244,17 @@ xkb_symbols "colemak" {
     key <AD08>	{ [         u,          U,    downarrow,      uparrow ] };
     key <AD09>	{ [         y,          Y,    leftarrow,          yen ] };
     key <AD10>	{ [    oslash,   Ooblique,   dead_acute, dead_doubleacute ] };
+
+    key <AC02>	{ [         r,          R,   registered,    trademark ] };
+    key <AC03>	{ [         s,          S,       ssharp,      section ] };
+    key <AC04>	{ [         t,          T,        thorn,        THORN ] };
+    key <AC05>	{ [         d,          D,          eth,          ETH ] };
+    key <AC07>	{ [         n,          N ] };
+    key <AC08>	{ [         e,          E,     EuroSign,         cent ] };
+    key <AC09>	{ [         i,          I,   rightarrow,     idotless ] };
+    key <AC10>	{ [         o,          O,           oe,           OE ] };
+
+    key <AB06>	{ [         k,          K,          kra,    ampersand ] };
 };
 
 // EXTRAS:

@@ -155,6 +155,56 @@ xkb_symbols "typewriter-legacy" {
 };
 
 partial alphanumeric_keys
+xkb_symbols "gost-6431-75-48" {
+
+    include "ru(typewriter)"
+    name[Group1]= "Russian (GOST 6431-75)";
+
+    key <TLDE> { [    section,  asciitilde  ] };
+    key <AE01> { [  parenleft,           1  ] };
+    key <AE02> { [ parenright,           2  ] };
+    key <AE03> { [      minus,           3  ] };
+    key <AE04> { [      slash,           4  ] };
+    key <AE05> { [   quotedbl,           5  ] };
+    key <AE06> { [      colon,           6  ] };
+    key <AE07> { [      comma,           7  ] };
+    key <AE08> { [     period,           8  ] };
+    key <AE09> { [ underscore,           9  ] };
+    key <AE10> { [   question,           0  ] };
+    key <AE11> { [    percent,        plus  ] };
+    key <AE12> { [    exclam,        equal  ] };
+
+    key <BKSL> { [   semicolon,  numerosign ] };
+
+    key <LSGT> { [ emdash, endash ] };
+};
+
+partial alphanumeric_keys
+xkb_symbols "gost-14289-88" {
+
+    include "ru(typewriter)"
+    name[Group1]= "Russian (GOST 14289-88)";
+
+    key <TLDE> { [  backslash, asterisk,   asciitilde, section ] };
+    key <AE01> { [  parenleft,        1,         less, guillemotleft ] };
+    key <AE02> { [ parenright,        2,           at, guillemotright ] };
+    key <AE03> { [      minus,        3,   numbersign, numerosign ] };
+    key <AE04> { [      slash,        4,        U20BD, dollar ] }; // ruble
+    key <AE05> { [   quotedbl,        5,      greater ] };
+    key <AE06> { [      colon,        6,  asciicircum ] };
+    key <AE07> { [      comma,        7,   ampersand  ] };
+    key <AE08> { [     period,        8,   apostrophe, dead_acute ] };
+    key <AE09> { [ underscore,        9,    braceleft, U201E ] };
+    key <AE10> { [   question,        0,   braceright, U201F ] };
+    key <AE11> { [    percent,     plus,  bracketleft, plusminus ] };
+    key <AE12> { [     exclam,    equal, bracketright ] };
+
+    key <BKSL> { [  semicolon,      bar,        grave ] };
+
+    key <LSGT> { [ emdash, endash ] };
+};
+
+partial alphanumeric_keys
 xkb_symbols "phonetic" {
 
     name[Group1]= "Russian (phonetic)";
@@ -528,7 +578,7 @@ xkb_symbols "phonetic_azerty" {
      key <AE12>	{ [     equal,       plus,   braceright,  dead_ogonek ]	};
 
      key <AB07> { [     comma,   question,        acute,  doubleacute ] };
-     key <AB08>	{ [ semicolon,     period, horizconnector,   multiply ]	};
+     key <AB08>	{ [ semicolon,     period,        U2022,     multiply ]	}; // bullet
      key <AB09>	{ [     colon,      slash, periodcentered,   division ]	};
      key <AB10>	{ [    exclam,    section, dead_belowdot, dead_abovedot ] };
 
@@ -637,6 +687,51 @@ xkb_symbols "phonetic_fr" {
     include "ru(phonetic_azerty)"
 
     name[Group1]= "Russian (phonetic, French)";
+};
+
+// Keyboard layout for Abkhazian.
+// 2022/04/13 by Nart Tlisha <daniel.abzakh@gmail.com>
+partial alphanumeric_keys
+xkb_symbols "ab" {
+
+    include "ru(common)"
+    name[Group1]= "Abkhazian (Russia)";
+
+    key <TLDE> { [     U0301,  asciitilde,        U201C,      U201D ] }; // double quotation marks
+    key <AE01> { [         1,      exclam,        U00AB,      U00BB ] }; // guillemets
+    key <AE02> { [         2,          at,     quotedbl,      U201E ] }; // low double quotation mark
+    key <AE03> { [         3,  numbersign,   numerosign             ] };
+    key <AE04> { [         4,      dollar,    semicolon             ] };
+    key <AE05> { [         5,     percent                           ] };
+    key <AE06> { [         6, asciicircum,        colon             ] };
+    key <AE07> { [         7,   ampersand,     question             ] };
+    key <AE08> { [         8,    asterisk                           ] };
+    key <AE09> { [         9,   parenleft,  bracketleft,  braceleft ] };
+    key <AE10> { [         0,  parenright, bracketright, braceright ] };
+    key <AE11> { [     minus,  underscore,        U2013,      U2014 ] }; // endash, emdash
+
+    key <AD01> { [        U049f,        U049e                       ] };
+    key <AD02> { [ Cyrillic_tse, Cyrillic_TSE,      U04b5,    U04b4 ] };
+    key <AD04> { [  Cyrillic_ka,  Cyrillic_KA,      U049b,    U049a ] };
+    key <AD07> { [ Cyrillic_ghe, Cyrillic_GHE,      U04f7,    U04f6 ] };
+    key <AD09> { [        U04d9,        U04d8                       ] };
+    key <AD10> { [  Cyrillic_ze,  Cyrillic_ZE,      U04e1,    U04e0 ] };
+    key <AD11> { [  Cyrillic_ha,  Cyrillic_HA,      U04b3,    U04b2 ] };
+    key <AD12> { [        U04bf,        U04be                       ] };
+
+    key <AC05> { [  Cyrillic_pe,  Cyrillic_PE,      U0525,    U0524 ] };
+    key <AC10> { [ Cyrillic_zhe, Cyrillic_ZHE,  semicolon,    colon ] };
+    key <AC11> { [        U04bd,        U04bc, apostrophe, quotedbl ] };
+    key <BKSL> { [    backslash,          bar,      slash           ] };
+
+    key <AB01> { [        U045f,        U040f                       ] };
+    key <AB02> { [ Cyrillic_che, Cyrillic_CHE,      U04b7,    U04b6 ] };
+    key <AB06> { [  Cyrillic_te,  Cyrillic_TE,      U04ad,    U04ac ] };
+    key <AB08> { [  Cyrillic_be,  Cyrillic_BE,      comma,     less ] };
+    key <AB09> { [        U04a9,        U04a8,     period,  greater ] };
+    key <AB10> { [        slash,     question,      comma,   period ] };
+
+    include "level3(ralt_switch)"
 };
 
 // EXTRAS:
@@ -948,7 +1043,7 @@ xkb_symbols "prxn" {
 
     key <LSGT> { [           U0495,             U0494,                       U0501,                  U0500,     U0503,    U0502,                                  U0509,    U0508 ] };                               // ҕ Ҕ ԁ Ԁ ԃ Ԃ ԉ Ԉ
     key <AB01> { [     Cyrillic_ya,       Cyrillic_YA,                       U0469,                  U0468,     U0467,    U0466,                                  UA657,    UA656 ] };                               // я Я ѩ Ѩ ѧ Ѧ ꙗ Ꙗ
-    key <AB02> { [    Cyrillic_che,      Cyrillic_CHE,                Serbian_tshe,           Serbian_TSHE,     Cyrillic_che_descender,  Cyrillic_CHE_descender,  U2016,    U00A6 ] };	                             // ч Ч ћ Ћ ҷ Ҷ ‖ ¦
+    key <AB02> { [    Cyrillic_che,      Cyrillic_CHE,                Serbian_tshe,           Serbian_TSHE,     Cyrillic_che_descender,  Cyrillic_CHE_descender,  U2016,brokenbar ] };	                             // ч Ч ћ Ћ ҷ Ҷ ‖ ¦
     key <AB03> { [      Cyrillic_es,      Cyrillic_ES,                       U046D,                  U046C,     U046B,    U046A,                                  U04F7,    U04F6 ] };                               // с С ѭ Ѭ ѫ Ѫ ӷ Ӷ
     key <AB04> { [       Cyrillic_em,     Cyrillic_EM,                    multiply,               division,     U22C5,    U2219,                                  U04CE,    U04CD ] };                               // м М × ÷ ⋅ ∙ ӎ Ӎ
     key <AB05> { [      Cyrillic_i,        Cyrillic_I,                       U0475,                  U0474,     U048B,    U048A,                         periodcentered,    U261B ] };    	                     // и И ѵ Ѵ ҋ Ҋ · ☛
@@ -1050,9 +1145,93 @@ xkb_symbols "phonetic_mac" {
     key <AE03> { [                 3,        numbersign, numerosign  ] };
     key <AE04> { [                 4,            dollar, U20BD       ] }; // ruble
     key <AE05> { [                 5,           percent  ] };
-    key <AE06> { [                 6,             caret  ] };
+    key <AE06> { [                 6,       asciicircum  ] };
     key <AE11> { [ Cyrillic_softsign, Cyrillic_SOFTSIGN, minus,       underscore  ] };
     key <AE12> { [ Cyrillic_hardsign, Cyrillic_HARDSIGN, equal,       plus        ] };
 
     include "level3(ralt_switch)"
+};
+
+// Russian engineering Cyrillic keyboard layout (Ручей)
+// Based on the Russian standard keyboard layout
+// Baryshkin Andrey <baryshkin_aa@codeblast.ru>
+// Last changes 2022/02/16
+// Version 1.2
+partial alphanumeric_keys
+xkb_symbols "ruchey_cyrillic" {
+
+    name[Group1]= "Russian (Engineering, Cyrillic)";
+
+    include "ru(common)"
+
+    key <TLDE> { [       Cyrillic_io,       Cyrillic_IO,          U00A7 ] };
+    key <AE01> { [                 1,            exclam,          U20BD ] };
+    key <AE02> { [                 2,        apostrophe,             at ] };
+    key <AE03> { [                 3,        numerosign,     numbersign ] };
+    key <AE04> { [                 4,         semicolon,         dollar ] };
+    key <AE05> { [                 5,          quotedbl,        percent ] };
+    key <AE06> { [                 6,             colon,    asciicircum ] };
+    key <AE07> { [                 7,          question,      ampersand ] };
+    key <AE08> { [                 8,          asterisk,     asciitilde ] };
+    key <AE09> { [                 9,         parenleft,  guillemotleft ] };
+    key <AE10> { [                 0,        parenright, guillemotright ] };
+    key <AE11> { [             minus,        underscore,     VoidSymbol ] };
+    key <AE12> { [             equal,              plus,     VoidSymbol ] };
+
+    key <AD11> { [       Cyrillic_ha,       Cyrillic_HA,      braceleft ] };
+    key <AD12> { [ Cyrillic_hardsign, Cyrillic_HARDSIGN,     braceright ] };
+
+    key <AC10> { [      Cyrillic_zhe,      Cyrillic_ZHE,    bracketleft ] };
+    key <AC11> { [        Cyrillic_e,        Cyrillic_E,   bracketright ] };
+
+    key <AB08> { [       Cyrillic_be,       Cyrillic_BE,           less ] };
+    key <AB09> { [       Cyrillic_yu,       Cyrillic_YU,        greater ] };
+    key <AB10> { [            period,             comma,          grave ] };
+
+    key <BKSL> { [             slash,         backslash,            bar ] };
+    key <LSGT> { [             slash,         backslash,            bar ] };
+
+    include "kpdl(dot)"
+};
+
+// Russian engineering Latin keyboard layout (Ручей)
+// Based on the English standard keyboard layout
+// Baryshkin Andrey <baryshkin_aa@codeblast.ru>
+// Last changes 2022/02/16
+// Version 1.2
+partial alphanumeric_keys
+xkb_symbols "ruchey_latin" {
+
+    name[Group1]= "Russian (Engineering, Latin)";
+
+    include "us(basic)"
+
+    key <TLDE> { [ VoidSymbol,   VoidSymbol,      	  U00A7 ] };
+    key <AE01> { [          1,       exclam,          U20BD ] };
+    key <AE02> { [          2,   apostrophe,             at ] };
+    key <AE03> { [          3,   numerosign,     numbersign ] };
+    key <AE04> { [          4,    semicolon,         dollar ] };
+    key <AE05> { [          5,     quotedbl,        percent ] };
+    key <AE06> { [          6,        colon,    asciicircum ] };
+    key <AE07> { [          7,     question,      ampersand ] };
+    key <AE08> { [          8,     asterisk,     asciitilde ] };
+    key <AE09> { [          9,    parenleft,  guillemotleft ] };
+    key <AE10> { [          0,   parenright, guillemotright ] };
+    key <AE11> { [      minus,   underscore,     VoidSymbol ] };
+    key <AE12> { [      equal,         plus,     VoidSymbol ] };
+
+    key <AD11> { [ VoidSymbol,   VoidSymbol,      braceleft ] };
+    key <AD12> { [ VoidSymbol,   VoidSymbol,     braceright ] };
+
+    key <AC10> { [ VoidSymbol,   VoidSymbol,    bracketleft ] };
+    key <AC11> { [ VoidSymbol,   VoidSymbol,   bracketright ] };
+
+    key <AB08> { [ VoidSymbol,   VoidSymbol,           less ] };
+    key <AB09> { [ VoidSymbol,   VoidSymbol,        greater ] };
+    key <AB10> { [     period,        comma,          grave ] };
+
+    key <BKSL> { [      slash,    backslash,            bar ] };
+    key <LSGT> { [      slash,    backslash,            bar ] };
+
+    include "kpdl(dot)"
 };

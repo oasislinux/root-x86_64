@@ -61,12 +61,6 @@ xkb_symbols "syc" {
 
     // Space plus zero-width non-joiner:
     include "nbsp(zwnj2)"
-
-    modifier_map Shift  { Shift_L, Shift_R };
-    modifier_map Lock   { Caps_Lock };
-    modifier_map Control{ Control_L, Control_R };
-    modifier_map Mod1   { Alt_L, Alt_R };
-    modifier_map Mod2   { Mode_switch };
 };
 
 partial alphanumeric_keys
@@ -124,12 +118,6 @@ xkb_symbols "syc_phonetic" {
     key <AB08> {  [  	0x1000700,	Arabic_comma				]     };
     key <AB09> {  [  	0x100002E,	Arabic_semicolon			]     };
     key <AB10> {  [  	0x1000707,	Arabic_question_mark			]     };
-
-    modifier_map Shift  { Shift_L, Shift_R };
-    modifier_map Lock   { Caps_Lock };
-    modifier_map Control{ Control_L, Control_R };
-    modifier_map Mod1   { Alt_L, Alt_R };
-    modifier_map Mod2   { Mode_switch };
 };
 
 partial alphanumeric_keys

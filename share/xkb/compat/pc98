@@ -16,10 +16,6 @@ default xkb_compatibility "basic" {
 	action= LockMods(modifiers=Shift);
     };
 
-//    interpret Any+Lock {
-//	action= LockMods(modifiers=Lock);
-//    };
-
     interpret Num_Lock+Any {
 	virtualModifier= NumLock;
 	action= LockMods(modifiers=NumLock);

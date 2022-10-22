@@ -10,6 +10,7 @@ xkb_symbols "basic" {
 
     name[Group1]="Estonian";
 
+    key <TLDE>	{ [dead_caron, dead_tilde,      notsign,      notsign ]	};
     key <AE03>	{ [         3, numbersign,     sterling,     sterling ]	};
     key <AE04>	{ [         4,   currency,       dollar,       dollar ]	};
     key <AE11>	{ [      plus,   question,    backslash, questiondown ]	};
@@ -21,9 +22,8 @@ xkb_symbols "basic" {
     key <AC02>	{ [         s,          S,       scaron,       Scaron ]	};
     key <AC10>	{ [odiaeresis, Odiaeresis,   dead_acute, dead_doubleacute ] };
     key <AC11>	{ [adiaeresis, Adiaeresis,  asciicircum,   dead_caron ]	};
-    key <TLDE>	{ [dead_caron, dead_tilde,      notsign,      notsign ]	};
-
     key <BKSL>	{ [apostrophe,   asterisk,      onehalf,   dead_breve ]	};
+
     key <AB01>	{ [         z,          Z,       zcaron,       Zcaron ]	};
     key <AB08>	{ [     comma,  semicolon,         less,     multiply ]	};
     key <AB09>	{ [    period,      colon,      greater,     division ]	};
