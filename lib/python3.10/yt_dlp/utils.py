@@ -2042,6 +2042,7 @@ class LockingUnsupportedError(OSError):
         super().__init__(self.msg)
 
 
+if True:
     try:
         import fcntl
 
