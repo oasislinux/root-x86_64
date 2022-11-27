@@ -362,5 +362,6 @@
 #define __NR_memfd_secret 447
 #define __NR_process_mrelease 448
 #define __NR_futex_waitv 449
+#define __NR_set_mempolicy_home_node 450
 
 #endif /* _ASM_X86_UNISTD_64_H */
