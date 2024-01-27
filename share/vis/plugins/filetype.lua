@@ -40,7 +40,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.awk$" },
 	},
 	bash = {
-		ext = { "%.bash$", "%.csh$", "%.sh$", "%.zsh$" },
+		ext = { "%.bash$", "%.csh$", "%.sh$", "%.zsh$" ,"^APKBUILD$", "%.ebuild$"},
 		mime = { "text/x-shellscript", "application/x-shellscript" },
 	},
 	batch = {
@@ -176,7 +176,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.go$" },
 	},
 	groovy = {
-		ext = { "%.groovy$", "%.gvy$" },
+		ext = { "%.groovy$", "%.gvy$", "^Jenkinsfile$" },
 	},
 	gtkrc = {
 		ext = { "%.gtkrc$" },
@@ -250,6 +250,9 @@ vis.ftdetect.filetypes = {
 	makefile = {
 		ext = { "%.iface$", "%.mak$", "%.mk$", "GNUmakefile", "makefile", "Makefile" },
 		mime = { "text/x-makefile" },
+		detect = function(_, data)
+			return data:match("^#!/usr/bin/make")
+		end
 	},
 	man = {
 		ext = {
@@ -352,7 +355,7 @@ vis.ftdetect.filetypes = {
 	},
 	routeros = {
 		ext = { "%.rsc" },
-		detect = function(file, data)
+		detect = function(_, data)
 			return data:match("^#.* by RouterOS")
 		end
 	},
@@ -394,7 +397,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.ddl$", "%.sql$" },
 	},
 	strace = {
-		detect = function(file, data)
+		detect = function(_, data)
 			return data:match("^execve%(")
 		end
 	},
@@ -436,7 +439,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.vcf$", "%.vcard$" },
 	},
 	verilog = {
-		ext = { "%.v$", "%.ver$" },
+		ext = { "%.v$", "%.ver$", "%.sv$" },
 	},
 	vhdl = {
 		ext = { "%.vh$", "%.vhd$", "%.vhdl$" },
@@ -501,10 +504,11 @@ vis.events.subscribe(vis.events.WIN_OPEN, function(win)
 	end
 
 	-- run file(1) to determine mime type
+	local mime
 	if name ~= nil then
 		local file = io.popen(string.format("file -bL --mime-type -- '%s'", name:gsub("'", "'\\''")))
 		if file then
-			local mime = file:read('*all')
+			mime = file:read('*all')
 			file:close()
 			if mime then
 				mime = mime:gsub('%s*$', '')
