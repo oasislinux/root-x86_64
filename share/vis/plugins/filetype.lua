@@ -1,7 +1,7 @@
 vis.ftdetect = {}
 
 vis.ftdetect.ignoresuffixes = {
-	"~$", "%.orig$", "%.bak$", "%.old$", "%.new$"
+	"~+$", "%.orig$", "%.bak$", "%.old$", "%.new$"
 }
 
 vis.ftdetect.filetypes = {
@@ -37,10 +37,13 @@ vis.ftdetect.filetypes = {
 		ext = { "%.au3$", "%.a3x$" },
 	},
 	awk = {
+		hashbang = { "^/usr/bin/[mng]awk%s+%-f" },
+		utility = { "^[mgn]?awk$", "^goawk$" },
 		ext = { "%.awk$" },
 	},
 	bash = {
-		ext = { "%.bash$", "%.csh$", "%.sh$", "%.zsh$" ,"^APKBUILD$", "%.ebuild$"},
+		utility = { "^[db]ash$", "^sh$","^t?csh$","^zsh$" },
+		ext = { "%.bash$", "%.csh$", "%.sh$", "%.zsh$" ,"^APKBUILD$", "%.ebuild$", "^.bashrc$", "^.bash_profile$" },
 		mime = { "text/x-shellscript", "application/x-shellscript" },
 	},
 	batch = {
@@ -119,6 +122,9 @@ vis.ftdetect.filetypes = {
 	elm = {
 		ext = { "%.elm$" },
 	},
+	mail = {
+		ext = { "%.eml$" },
+	},
 	erlang = {
 		ext = { "%.erl$", "%.hrl$" },
 	},
@@ -132,6 +138,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.fnl$" },
 	},
 	fish = {
+		utility = { "^fish$" },
 		ext = { "%.fish$" },
 	},
 	forth = {
@@ -144,7 +151,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.fs$" },
 	},
 	fstab = {
-		ext = { "fstab" },
+		ext = { "^fstab$" },
 	},
 	gap = {
 		ext = { "%.g$", "%.gd$", "%.gi$", "%.gap$" },
@@ -160,14 +167,18 @@ vis.ftdetect.filetypes = {
 		ext = { "%.feature$" },
 	},
 	['git-commit'] = {
+		alt_name = "diff",
 		ext = { "^COMMIT_EDITMSG$" },
 		cmd = { "set colorcolumn 72" },
 	},
 	['git-rebase'] = {
 		ext = { "git%-rebase%-todo" },
 	},
+	gleam = {
+		ext = { "%.gleam$" },
+	},
 	glsl = {
-		ext = { "%.glslf$", "%.glslv$" },
+		ext = { "%.glsl[fv]?$" },
 	},
 	gnuplot = {
 		ext = { "%.dem$", "%.plt$" },
@@ -181,12 +192,15 @@ vis.ftdetect.filetypes = {
 	gtkrc = {
 		ext = { "%.gtkrc$" },
 	},
+	hare = {
+		ext = { "%.ha$" }
+	},
 	haskell = {
 		ext = { "%.hs$" },
 		mime = { "text/x-haskell" },
 	},
 	html = {
-		ext = { "%.htm$", "%.html$", "%.shtm$", "%.shtml$", "%.xhtml$" },
+		ext = { "%.[sx]?htm[l]?$" },
 		mime = { "text/x-html" },
 	},
 	icon = {
@@ -208,7 +222,10 @@ vis.ftdetect.filetypes = {
 		ext = { "%.bsh$", "%.java$" },
 	},
 	javascript = {
-		ext = { "%.cjs$", "%.js$", "%.jsfl$", "%.mjs$", "%.ts$" },
+		ext = { "%.cjs$", "%.js$", "%.jsfl$", "%.mjs$", "%.jsx$" },
+	},
+	jq = {
+		ext = { "%.jq$" },
 	},
 	json = {
 		ext = { "%.json$" },
@@ -244,22 +261,18 @@ vis.ftdetect.filetypes = {
 		ext = { "%.lgt$" },
 	},
 	lua = {
+		utility = {"^lua%-?5?%d?$", "^lua%-?5%.%d$" },
 		ext = { "%.lua$" },
 		mime = { "text/x-lua" },
 	},
 	makefile = {
-		ext = { "%.iface$", "%.mak$", "%.mk$", "GNUmakefile", "makefile", "Makefile" },
+		hashbang = {"^#!/usr/bin/make"},
+		utility = {"^make$"},
+		ext = { "%.iface$", "%.mak$", "%.mk$", "^GNUmakefile$", "^makefile$", "^Makefile$" },
 		mime = { "text/x-makefile" },
-		detect = function(_, data)
-			return data:match("^#!/usr/bin/make")
-		end
 	},
 	man = {
-		ext = {
-			"%.1$", "%.2$", "%.3$", "%.4$", "%.5$", "%.6$", "%.7$",
-			"%.8$", "%.9$", "%.1x$", "%.2x$", "%.3x$", "%.4x$",
-			"%.5x$", "%.6x$", "%.7x$", "%.8x$", "%.9x$"
-		},
+		ext = { "%.[1-9][xp]?$", "%.ms$", "%.me$", "%.mom$", "%.mm$", "%.tmac$" },
 	},
 	markdown = {
 		ext = { "%.md$", "%.markdown$" },
@@ -267,6 +280,12 @@ vis.ftdetect.filetypes = {
 	},
 	meson = {
 		ext = { "^meson%.build$" },
+	},
+	modula2 = {
+		ext = { "%.mod$", "%.def$" },
+	},
+	modula3 = {
+		ext = { "%.mg$", "%.ig$", "%.i3$", "%.m3$" },
 	},
 	moonscript = {
 		ext = { "%.moon$" },
@@ -308,13 +327,13 @@ vis.ftdetect.filetypes = {
 		ext = { "%.pike$", "%.pmod$" },
 	},
 	pkgbuild = {
-		ext = { "^PKGBUILD$" },
+		ext = { "^PKGBUILD$", "%.PKGBUILD$" },
 	},
 	pony = {
 		ext = { "%.pony$" },
 	},
 	powershell = {
-		ext = { "%.ps1$" },
+		ext = { "%.ps1$", "%.psm1$" },
 	},
 	prolog = {
 		ext = { "%.pl$", "%.pro$", "%.prolog$" },
@@ -332,13 +351,15 @@ vis.ftdetect.filetypes = {
 		ext = { "%.pure$" },
 	},
 	python = {
-		ext = { "%.sc$", "%.py$", "%.pyw$" },
-		mime = { "text/x-python" },
+		utility = { "^python%d?" },
+		ext = { "%.sc$", "%.py[iw]?$" },
+		mime = { "text/x-python", "text/x-script.python" },
 	},
 	reason = {
 		ext = { "%.re$" },
 	},
 	rc = {
+		utility = {"^rc$"},
 		ext = { "%.rc$", "%.es$" },
 	},
 	rebol = {
@@ -358,6 +379,9 @@ vis.ftdetect.filetypes = {
 		detect = function(_, data)
 			return data:match("^#.* by RouterOS")
 		end
+	},
+	rpmspec = {
+		ext = { "%.spec$" },
 	},
 	rstats = {
 		ext = { "%.R$", "%.Rout$", "%.Rhistory$", "%.Rt$", "Rout.save", "Rout.fail" },
@@ -412,6 +436,7 @@ vis.ftdetect.filetypes = {
 		ext = { "%.taskpaper$" },
 	},
 	tcl = {
+		utility = {"^tclsh$", "^jimsh$" },
 		ext = { "%.tcl$", "%.tk$" },
 	},
 	texinfo = {
@@ -424,6 +449,12 @@ vis.ftdetect.filetypes = {
 	},
 	toml = {
 		ext = { "%.toml$" },
+	},
+	typescript = {
+		ext = { "%.ts$", "%.tsx$" },
+	},
+	typst = {
+		ext = { "%.typ$", "%.typst$" },
 	},
 	vala = {
 		ext = { "%.vala$" }
@@ -451,7 +482,11 @@ vis.ftdetect.filetypes = {
 		ext = { "%.xs$", "^%.xsin$", "^%.xsrc$" },
 	},
 	xml = {
-		ext = { "%.dtd$", "%.plist$", "%.svg$", "%.xml$", "%.xsd$", "%.xsl$", "%.xslt$", "%.xul$" },
+		ext = {
+			"%.dtd$", "%.glif$", "%.plist$", "%.svg$", "%.xml$",
+			"%.xsd$", "%.xsl$", "%.xslt$", "%.xul$"
+		},
+		mime = { "text/xml" },
 	},
 	xtend = {
 		ext = {"%.xtend$" },
@@ -471,42 +506,46 @@ vis.events.subscribe(vis.events.WIN_OPEN, function(win)
 		for _, cmd in pairs(filetype.cmd or {}) do
 			vis:command(cmd)
 		end
-		win:set_syntax(syntax)
-	end
-
-	local name = win.file.name
-	-- remove ignored suffixes from filename
-	local sanitizedfn = name
-	if sanitizedfn ~= nil then
-		sanitizedfn = sanitizedfn:gsub('^.*/', '')
-		repeat
-			local changed = false
-			for _, pattern in pairs(vis.ftdetect.ignoresuffixes) do
-				local start = sanitizedfn:find(pattern)
-				if start then
-					sanitizedfn = sanitizedfn:sub(1, start-1)
-					changed = true
-				end
-			end
-		until not changed
-	end
-
-	-- detect filetype by filename ending with a configured extension
-	if sanitizedfn ~= nil then
-		for lang, ft in pairs(vis.ftdetect.filetypes) do
-			for _, pattern in pairs(ft.ext or {}) do
-				if sanitizedfn:match(pattern) then
-					set_filetype(lang, ft)
-					return
-				end
-			end
+		if not vis.lexers.property then return end
+		local path = vis.lexers.property['scintillua.lexers']
+		local lexname = filetype.alt_name or syntax
+		local lexpath = package.searchpath('lexers/'..lexname, path)
+		if lexpath ~= nil then
+			win:set_syntax(lexname)
+		else
+			win:set_syntax(nil)
 		end
 	end
 
-	-- run file(1) to determine mime type
+	local path = win.file.name -- filepath
 	local mime
-	if name ~= nil then
-		local file = io.popen(string.format("file -bL --mime-type -- '%s'", name:gsub("'", "'\\''")))
+
+	if path and #path > 0 then
+		local name = path:match("[^/]+$") -- filename
+		if name then
+			local unchanged
+			while #name > 0 and name ~= unchanged do
+				unchanged = name
+				for _, pattern in ipairs(vis.ftdetect.ignoresuffixes) do
+					name = name:gsub(pattern, "")
+				end
+			end
+		end
+
+		if name and #name > 0 then
+			-- detect filetype by filename ending with a configured extension
+			for lang, ft in pairs(vis.ftdetect.filetypes) do
+				for _, pattern in pairs(ft.ext or {}) do
+					if name:match(pattern) then
+						set_filetype(lang, ft)
+						return
+					end
+				end
+			end
+		end
+
+		-- run file(1) to determine mime type
+		local file = io.popen(string.format("file -bL --mime-type -- '%s'", path:gsub("'", "'\\''")))
 		if file then
 			mime = file:read('*all')
 			file:close()
@@ -534,6 +573,56 @@ vis.events.subscribe(vis.events.WIN_OPEN, function(win)
 			if type(ft.detect) == 'function' and ft.detect(file, data) then
 				set_filetype(lang, ft)
 				return
+			end
+		end
+
+--[[ hashbang check
+	hashbangs only have command <SPACE> argument
+		if /env, find utility in args
+			discard first arg if /-[^S]*S/; and all subsequent /=/
+			NOTE: this means you can't have a command with /^-|=/
+	return first field, which should be the utility.
+	NOTE: long-options unsupported
+--]]
+		local fullhb, utility = data:match"^#![ \t]*(/+[^/\n]+[^\n]*)"
+		if fullhb then
+			local i, field = 1, {}
+			for m in fullhb:gmatch"%g+" do field[i],i = m,i+1 end
+			-- NOTE: executables should not have a space (or =, see below)
+			if field[1]:match"/env$" then
+				table.remove(field,1)
+				-- it is assumed that the first argument are short options, with -S inside
+				if string.match(field[1] or "", "^%-[^S-]*S") then -- -S found
+					table.remove(field,1)
+					-- skip all name=value
+					while string.match(field[1] or "","=") do
+						table.remove(field,1)
+					end
+					-- (hopefully) whatever is left in field[1] should be the utility or nil
+				end
+			end
+			utility = string.match(field[1] or "", "[^/]+$") -- remove filepath
+		end
+
+		local function searcher(tbl, subject)
+			for _, pattern in ipairs(tbl or {}) do
+				if string.match(subject, pattern) then
+					return true
+				end
+			end
+			return false
+		end
+
+		if utility or fullhb then
+			for lang, ft in pairs(vis.ftdetect.filetypes) do
+				if
+					utility and searcher(ft.utility, utility)
+					or
+					fullhb and searcher(ft.hashbang, fullhb)
+				then
+					set_filetype(lang, ft)
+					return
+				end
 			end
 		end
 	end

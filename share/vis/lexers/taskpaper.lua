@@ -1,59 +1,27 @@
--- Copyright (c) 2016-2017 Larry Hynes. See LICENSE.
+-- Copyright (c) 2016-2024 Larry Hynes. See LICENSE.
 -- Taskpaper LPeg lexer
 
-local l = require('lexer')
-local token = l.token
-local P, R, S = lpeg.P, lpeg.R, lpeg.S
+local lexer = lexer
+local P, S = lpeg.P, lpeg.S
 
-local M = {_NAME = 'taskpaper'}
+local lex = lexer.new(..., {lex_by_line = true})
 
-local delimiter = P('    ') + P('\t')
+-- Notes.
+local delimiter = lpeg.B('    ') + lpeg.B('\t')
+lex:add_rule('note', delimiter * lex:tag('note', lexer.to_eol(lexer.alnum)))
 
--- Whitespace
-local ws = token(l.WHITESPACE, l.space^1)
+-- Tasks.
+lex:add_rule('task', delimiter * lex:tag(lexer.LIST, '-'))
 
--- Tags
-local day_tag = token('day_tag', (P('@today') + P('@tomorrow')))
+-- Projects.
+lex:add_rule('project', lex:tag(lexer.HEADING,
+  lexer.range(lexer.starts_line(lexer.alnum), ':') * lexer.newline))
 
-local overdue_tag = token('overdue_tag', P('@overdue'))
+-- Tags.
+lex:add_rule('extended_tag', lex:tag(lexer.TAG .. '.extended', '@' * lexer.word * '(' *
+  (lexer.word + lexer.digit + '-')^1 * ')'))
+lex:add_rule('day_tag', lex:tag(lexer.TAG .. '.day', (P('@today') + '@tomorrow')))
+lex:add_rule('overdue_tag', lex:tag(lexer.TAG .. '.overdue', '@overdue'))
+lex:add_rule('plain_tag', lex:tag(lexer.TAG .. '.plain', '@' * lexer.word))
 
-local plain_tag = token('plain_tag', P('@') * l.word)
-
-local extended_tag = token('extended_tag',
-                           P('@') * l.word * P('(') *
-                           (l.word + R('09') + P('-'))^1 * P(')'))
-
--- Projects
-local project = token('project',
-                      l.nested_pair(l.starts_line(l.alnum), ':') * l.newline)
-
--- Notes
-local note = token('note', delimiter^1 * l.alnum * l.nonnewline^0)
-
--- Tasks
-local task = token('task', delimiter^1 * P('-') + l.newline)
-
-M._rules = {
-  {'note', note},
-  {'task', task},
-  {'project', project},
-  {'extended_tag', extended_tag},
-  {'day_tag', day_tag},
-  {'overdue_tag', overdue_tag},
-  {'plain_tag', plain_tag},
-  {'whitespace', ws},
-}
-
-M._tokenstyles = {
-  note = l.STYLE_CONSTANT,
-  task = l.STYLE_FUNCTION,
-  project = l.STYLE_TAG,
-  extended_tag = l.STYLE_COMMENT,
-  day_tag = l.STYLE_CLASS,
-  overdue_tag = l.STYLE_PREPROCESSOR,
-  plain_tag = l.STYLE_COMMENT,
-}
-
-M._LEXBYLINE = true
-
-return M
+return lex

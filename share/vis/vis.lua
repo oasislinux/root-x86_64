@@ -18,14 +18,14 @@
 -- @usage
 -- vis:operator_new("gq", function(file, range, pos)
 -- 	local status, out, err = vis:pipe(file, range, "fmt")
--- 	if not status then
+-- 	if status ~= 0 then
 -- 		vis:info(err)
 -- 	else
 -- 		file:delete(range)
 -- 		file:insert(range.start, out)
 -- 	end
 -- 	return range.start -- new cursor location
--- end, "Formating operator, filter range through fmt(1)")
+-- end, "Formatting operator, filter range through fmt(1)")
 --
 vis.operator_new = function(vis, key, operator, help)
 	local id = vis:operator_register(operator)
@@ -47,7 +47,7 @@ end
 -- The motion function will receive the @{Window} and an initial position
 -- (in bytes from the start of the file) as argument and is expected to
 -- return the resulting position.
--- @tparam string key the key to associate with the new mption
+-- @tparam string key the key to associate with the new option
 -- @tparam function motion the motion logic implemented as Lua function
 -- @tparam[opt] string help the single line help text as displayed in `:help`
 -- @treturn bool whether the new motion could be installed
@@ -121,6 +121,20 @@ elseif not vis:module_exist('lexer') then
 	vis:info('WARNING: could not find lexer module')
 else
 	vis.lexers = require('lexer')
+
+	--- Cache of loaded lexers
+	--
+	-- Caching lexers causes lexer tables to be constructed once and reused
+	-- during each HIGHLIGHT event. Additionally it allows to modify the lexer
+	-- used for syntax highlighting from Lua code.
+	local lexers = {}
+	local load_lexer = vis.lexers.load
+	vis.lexers.load = function (name, alt_name, cache)
+		if cache and lexers[alt_name or name] then return lexers[alt_name or name] end
+		local lexer = load_lexer(name, alt_name)
+		if cache then lexers[alt_name or name] = lexer end
+		return lexer
+	end
 	vis.lpeg = require('lpeg')
 end
 
@@ -152,6 +166,8 @@ local events = {
 	WIN_OPEN = "Event::WIN_OPEN", -- see @{win_open}
 	WIN_STATUS = "Event::WIN_STATUS", -- see @{win_status}
 	TERM_CSI = "Event::TERM_CSI", -- see @{term_csi}
+	PROCESS_RESPONSE = "Event::PROCESS_RESPONSE", -- see @{process_response}
+	UI_DRAW = "Event::UI_DRAW", -- see @{ui_draw}
 }
 
 events.file_close = function(...) events.emit(events.FILE_CLOSE, ...) end
@@ -167,6 +183,8 @@ events.win_highlight = function(...) events.emit(events.WIN_HIGHLIGHT, ...) end
 events.win_open = function(...) events.emit(events.WIN_OPEN, ...) end
 events.win_status = function(...) events.emit(events.WIN_STATUS, ...) end
 events.term_csi = function(...) events.emit(events.TERM_CSI, ...) end
+events.process_response = function(...) events.emit(events.PROCESS_RESPONSE, ...) end
+events.ui_draw = function(...) events.emit(events.UI_DRAW, ...) end
 
 local handlers = {}
 
@@ -214,7 +232,7 @@ end
 -- value terminates the event propagation. The other handlers will not be called.
 --
 -- @tparam string event the event name
--- @tparam ... ... the remaining paramters are passed on to the handler
+-- @tparam ... ... the remaining parameters are passed on to the handler
 events.emit = function(event, ...)
 	local h = handlers[event]
 	if not h then return end
@@ -263,9 +281,20 @@ vis.types.window.set_syntax = function(win, syntax)
 	local lexer = lexers.load(syntax)
 	if not lexer then return false end
 
-	for token_name, id in pairs(lexer._TOKENSTYLES) do
-		local style = lexers['STYLE_'..string.upper(token_name)] or lexer._EXTRASTYLES[token_name]
-		win:style_define(id, style)
+	for id, token_name in ipairs(lexer._TAGS) do
+		local style = lexers['STYLE_' .. token_name:upper():gsub("%.", "_")] or ''
+		if type(style) == 'table' then
+			local s = ''
+			if style.attr then
+				s = string.format("%s,%s", s, attr)
+			elseif style.fore then
+				s = string.format("%s,fore:%s", s, style.fore)
+			elseif style.back then
+				s = string.format("%s,back:%s", s, style.back)
+			end
+			style = s
+		end
+		if style ~= nil then win:style_define(id, style) end
 	end
 
 	win.syntax = syntax

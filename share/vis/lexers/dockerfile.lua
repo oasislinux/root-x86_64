@@ -1,55 +1,47 @@
--- Copyright 2016-2017 Alejandro Baez (https://keybase.io/baez). See LICENSE.
+-- Copyright 2016-2024 Alejandro Baez (https://keybase.io/baez). See LICENSE.
 -- Dockerfile LPeg lexer.
 
-local l = require('lexer')
-local token, word_match = l.token, l.word_match
-local P, R, S = lpeg.P, lpeg.R, lpeg.S
+local lexer = lexer
+local P, S, B = lpeg.P, lpeg.S, lpeg.B
 
-local M = {_NAME = 'dockerfile'}
-
--- Whitespace
-local indent = #l.starts_line(S(' \t')) *
-               (token(l.WHITESPACE, ' ') + token('indent_error', '\t'))^1
-local ws = token(l.WHITESPACE, S(' \t')^1 + l.newline^1)
-
--- Comments.
-local comment = token(l.COMMENT, '#' * l.nonnewline^0)
-
--- Strings.
-local sq_str = l.delimited_range("'", false, true)
-local dq_str = l.delimited_range('"')
-local string = token(l.STRING, sq_str + dq_str)
-
--- Numbers.
-local number = token(l.NUMBER, l.float + l.integer)
+local lex = lexer.new(..., {fold_by_indentation = true})
 
 -- Keywords.
-local keyword = token(l.KEYWORD, word_match{
-  'ADD', 'ARG', 'CMD', 'COPY', 'ENTRYPOINT', 'ENV', 'EXPOSE', 'FROM', 'LABEL',
-  'MAINTAINER', 'ONBUILD', 'RUN', 'STOPSIGNAL', 'USER', 'VOLUME', 'WORKDIR'
-})
+local keyword = lex:tag(lexer.KEYWORD, lex:word_match(lexer.KEYWORD))
+lex:add_rule('keyword', keyword)
 
 -- Identifiers.
-local identifier = token(l.IDENTIFIER, l.word)
+lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER, lexer.word))
 
 -- Variable.
-local variable = token(l.VARIABLE,
-                       S('$')^1 * (S('{')^1 * l.word * S('}')^1 + l.word))
+lex:add_rule('variable',
+-B('\\') * lex:tag(lexer.OPERATOR, '$' * P('{')^-1) * lex:tag(lexer.VARIABLE, lexer.word))
+
+-- Strings.
+local sq_str = lexer.range("'", false, false)
+local dq_str = lexer.range('"')
+lex:add_rule('string', lex:tag(lexer.STRING, sq_str + dq_str))
+
+-- Comments.
+lex:add_rule('comment', lex:tag(lexer.COMMENT, lexer.to_eol('#')))
+
+-- Numbers.
+lex:add_rule('number', lex:tag(lexer.NUMBER, lexer.number))
 
 -- Operators.
-local operator = token(l.OPERATOR, S('\\[],=:{}'))
+lex:add_rule('operator', lex:tag(lexer.OPERATOR, S('\\[],=:{}')))
 
-M._rules = {
-  {'whitespace', ws},
-  {'keyword', keyword},
-  {'variable', variable},
-  {'identifier', identifier},
-  {'string', string},
-  {'comment', comment},
-  {'number', number},
-  {'operator', operator},
-}
+local bash = lexer.load('bash')
+local start_rule = #P('RUN') * keyword * bash:get_rule('whitespace')
+local end_rule = -B('\\') * #lexer.newline * lex:get_rule('whitespace')
+lex:embed(bash, start_rule, end_rule)
 
-M._FOLDBYINDENTATION = true
+-- Word lists.
+lex:set_word_list(lexer.KEYWORD, {
+  'ADD', 'ARG', 'CMD', 'COPY', 'ENTRYPOINT', 'ENV', 'EXPOSE', 'FROM', 'LABEL', 'MAINTAINER',
+  'ONBUILD', 'RUN', 'STOPSIGNAL', 'USER', 'VOLUME', 'WORKDIR'
+})
 
-return M
+lexer.property['scintillua.comment'] = '#'
+
+return lex

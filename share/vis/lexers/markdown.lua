@@ -1,109 +1,95 @@
--- Copyright 2006-2017 Mitchell mitchell.att.foicica.com. See LICENSE.
+-- Copyright 2006-2024 Mitchell. See LICENSE.
 -- Markdown LPeg lexer.
 
-local l = require('lexer')
-local token, word_match = l.token, l.word_match
-local P, R, S = lpeg.P, lpeg.R, lpeg.S
+local lexer = lexer
+local P, S, B = lpeg.P, lpeg.S, lpeg.B
 
-local M = {_NAME = 'markdown'}
+local lex = lexer.new(..., {no_user_word_lists = true})
 
--- Whitespace.
-local ws = token(l.WHITESPACE, S(' \t')^1 + S('\v\r\n')^1)
+-- Distinguish between horizontal and vertical space so html start rule has a chance to match.
+lex:modify_rule('whitespace', lex:tag(lexer.WHITESPACE, S(' \t')^1 + S('\r\n')^1))
 
 -- Block elements.
-local header = token('h6', l.starts_line('######') * l.nonnewline^0) +
-               token('h5', l.starts_line('#####') * l.nonnewline^0) +
-               token('h4', l.starts_line('####') * l.nonnewline^0) +
-               token('h3', l.starts_line('###') * l.nonnewline^0) +
-               token('h2', l.starts_line('##') * l.nonnewline^0) +
-               token('h1', l.starts_line('#') * l.nonnewline^0)
+local function h(n)
+  return lex:tag(string.format('%s.h%s', lexer.HEADING, n),
+    lexer.to_eol(lexer.starts_line(string.rep('#', n))))
+end
+lex:add_rule('header', h(6) + h(5) + h(4) + h(3) + h(2) + h(1))
 
-local blockquote = token(l.STRING,
-                         lpeg.Cmt(l.starts_line(S(' \t')^0 * '>'),
-                                  function(input, index)
-                                    local _, e = input:find('\n[ \t]*\r?\n',
-                                                            index)
-                                    return (e or #input) + 1
-                                  end))
+lex:add_rule('hr',
+  lex:tag('hr', lpeg.Cmt(lexer.starts_line(lpeg.C(S('*-_')), true), function(input, index, c)
+    local line = input:match('[^\r\n]*', index):gsub('[ \t]', '')
+    if line:find('[^' .. c .. ']') or #line < 2 then return nil end
+    return (select(2, input:find('\r?\n', index)) or #input) + 1 -- include \n for eolfilled styles
+  end)))
 
-local blockcode = token('code', l.starts_line(P(' ')^4 + P('\t')) * -P('<') *
-                                l.nonnewline^0)
+lex:add_rule('list', lex:tag(lexer.LIST,
+  lexer.starts_line(lexer.digit^1 * '.' + S('*+-'), true) * S(' \t')))
 
-local hr = token('hr', lpeg.Cmt(l.starts_line(S(' \t')^0 * lpeg.C(S('*-_'))),
-                                function(input, index, c)
-                                  local line = input:match('[^\n]*', index)
-                                  line = line:gsub('[ \t]', '')
-                                  if line:find('[^'..c..']') or #line < 2 then
-                                    return nil
-                                  end
-                                  return (input:find('\n', index) or #input) + 1
-                                end))
+local hspace = lexer.space - '\n'
+local blank_line = '\n' * hspace^0 * ('\n' + P(-1))
+
+local code_line = lexer.starts_line((B('    ') + B('\t')) * lexer.to_eol(), true)
+local code_block =
+  lexer.range(lexer.starts_line('```', true), '\n```' * hspace^0 * ('\n' + P(-1))) +
+    lexer.range(lexer.starts_line('~~~', true), '\n~~~' * hspace^0 * ('\n' + P(-1)))
+local code_inline = lpeg.Cmt(lpeg.C(P('`')^1), function(input, index, bt)
+  -- `foo`, ``foo``, ``foo`bar``, `foo``bar` are all allowed.
+  local _, e = input:find('[^`]' .. bt .. '%f[^`]', index)
+  return (e or #input) + 1
+end)
+lex:add_rule('block_code', lex:tag(lexer.CODE, code_line + code_block + code_inline))
+
+lex:add_rule('blockquote',
+  lex:tag(lexer.STRING, lpeg.Cmt(lexer.starts_line('>', true), function(input, index)
+    local _, e = input:find('\n[ \t]*\r?\n', index) -- the next blank line (possibly with indentation)
+    return (e or #input) + 1
+  end)))
 
 -- Span elements.
-local dq_str = token(l.STRING, l.delimited_range('"', false, true))
-local sq_str = token(l.STRING, l.delimited_range("'", false, true))
-local paren_str = token(l.STRING, l.delimited_range('()'))
-local link = token('link', P('!')^-1 * l.delimited_range('[]') *
-                           (P('(') * (l.any - S(') \t'))^0 *
-                            (S(' \t')^1 *
-                             l.delimited_range('"', false, true))^-1 * ')' +
-                            S(' \t')^0 * l.delimited_range('[]')) +
-                           P('http://') * (l.any - l.space)^1)
-local link_label = token('link_label', l.delimited_range('[]') * ':') * ws *
-                   token('link_url', (l.any - l.space)^1) *
-                   (ws * (dq_str + sq_str + paren_str))^-1
+lex:add_rule('escape', lex:tag(lexer.DEFAULT, P('\\') * 1))
 
-local strong = token('strong', (P('**') * (l.any - '**')^0 * P('**')^-1) +
-                               (P('__') * (l.any - '__')^0 * P('__')^-1))
-local em = token('em',
-                 l.delimited_range('*', true) + l.delimited_range('_', true))
-local code = token('code', (P('``') * (l.any - '``')^0 * P('``')^-1) +
-                           l.delimited_range('`', true, true))
+local link_text = lexer.range('[', ']', true)
+local link_target =
+  '(' * (lexer.any - S(') \t'))^0 * (S(' \t')^1 * lexer.range('"', false, false))^-1 * ')'
+local link_url = 'http' * P('s')^-1 * '://' * (lexer.any - lexer.space)^1 +
+  ('<' * lexer.alpha^2 * ':' * (lexer.any - lexer.space - '>')^1 * '>')
+lex:add_rule('link', lex:tag(lexer.LINK, P('!')^-1 * link_text * link_target + link_url))
 
-local escape = token(l.DEFAULT, P('\\') * 1)
+local link_ref = lex:tag(lexer.REFERENCE, link_text * S(' \t')^0 * lexer.range('[', ']', true))
+local ref_link_label = lex:tag(lexer.REFERENCE, lexer.range('[', ']', true) * ':')
+local ws = lex:get_rule('whitespace')
+local ref_link_url = lex:tag(lexer.LINK, (lexer.any - lexer.space)^1)
+local ref_link_title = lex:tag(lexer.STRING, lexer.range('"', true, false) +
+  lexer.range("'", true, false) + lexer.range('(', ')', true))
+lex:add_rule('link_ref', link_ref + ref_link_label * ws * ref_link_url * (ws * ref_link_title)^-1)
 
-local list = token('list',
-                   l.starts_line(S(' \t')^0 * (S('*+-') + R('09')^1 * '.')) *
-                   S(' \t'))
+local punct_space = lexer.punct + lexer.space
 
-M._rules = {
-  {'header', header},
-  {'list', list},
-  {'blockquote', blockquote},
-  {'blockcode', blockcode},
-  {'hr', hr},
-  {'whitespace', ws},
-  {'link_label', link_label},
-  {'escape', escape},
-  {'link', link},
-  {'strong', strong},
-  {'em', em},
-  {'code', code},
-}
+-- Handles flanking delimiters as described in
+-- https://github.github.com/gfm/#emphasis-and-strong-emphasis in the cases where simple
+-- delimited ranges are not sufficient.
+local function flanked_range(s, not_inword)
+  local fl_char = lexer.any - s - lexer.space
+  local left_fl = B(punct_space - s) * s * #fl_char + s * #(fl_char - lexer.punct)
+  local right_fl = B(lexer.punct) * s * #(punct_space - s) + B(fl_char) * s
+  return left_fl * (lexer.any - blank_line - (not_inword and s * #punct_space or s))^0 * right_fl
+end
 
-local font_size = 10
-local hstyle = 'fore:red'
-M._tokenstyles = {
-  h6 = hstyle,
-  h5 = hstyle..',size:'..(font_size + 1),
-  h4 = hstyle..',size:'..(font_size + 2),
-  h3 = hstyle..',size:'..(font_size + 3),
-  h2 = hstyle..',size:'..(font_size + 4),
-  h1 = hstyle..',size:'..(font_size + 5),
-  code = l.STYLE_EMBEDDED..',eolfilled',
-  hr = l.STYLE_DEFAULT..',bold',
-  link = 'underlined',
-  link_url = 'underlined',
-  link_label = l.STYLE_LABEL,
-  strong = 'bold',
-  em = 'italics',
-  list = l.STYLE_CONSTANT,
-}
+local asterisk_strong = flanked_range('**')
+local underscore_strong = (B(punct_space) + #lexer.starts_line('_')) * flanked_range('__', true) *
+  #(punct_space + -1)
+lex:add_rule('strong', lex:tag(lexer.BOLD, asterisk_strong + underscore_strong))
+
+local asterisk_em = flanked_range('*')
+local underscore_em = (B(punct_space) + #lexer.starts_line('_')) * flanked_range('_', true) *
+  #(punct_space + -1)
+lex:add_rule('em', lex:tag(lexer.ITALIC, asterisk_em + underscore_em))
 
 -- Embedded HTML.
-local html = l.load('html')
-local start_rule = token('tag', l.starts_line(S(' \t')^0 * '<'))
-local end_rule = token(l.DEFAULT, P('\n')) -- TODO: l.WHITESPACE causes errors
-l.embed_lexer(M, html, start_rule, end_rule)
+local html = lexer.load('html')
+local start_rule = lexer.starts_line(P(' ')^-3) * #P('<') * html:get_rule('tag') -- P(' ')^4 starts code_line
+local end_rule = #blank_line * ws
+lex:embed(html, start_rule, end_rule)
 
-return M
+return lex

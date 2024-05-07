@@ -1,88 +1,90 @@
--- Copyright 2015-2017 Alejandro Baez (https://keybase.io/baez). See LICENSE.
+-- Copyright 2015-2024 Alejandro Baez (https://keybase.io/baez). See LICENSE.
 -- Rust LPeg lexer.
 
-local l = require("lexer")
-local token, word_match = l.token, l.word_match
-local P, R, S = lpeg.P, lpeg.R, lpeg.S
+local lexer = lexer
+local P, S = lpeg.P, lpeg.S
+local C, Cmt = lpeg.C, lpeg.Cmt
 
-local M = {_NAME = 'rust'}
-
--- Whitespace.
-local ws = token(l.WHITESPACE, l.space^1)
-
--- Comments.
-local line_comment = '//' * l.nonnewline_esc^0
-local block_comment = '/*' * (l.any - '*/')^0 * P('*/')^-1
-local comment = token(l.COMMENT, line_comment + block_comment)
-
--- Strings.
-local sq_str = P('L')^-1 * l.delimited_range("'")
-local dq_str = P('L')^-1 * l.delimited_range('"')
-local raw_str =  '#"' * (l.any - '#')^0 * P('#')^-1
-local string = token(l.STRING, dq_str + raw_str)
-
--- Numbers.
-local number = token(l.NUMBER, l.float + (l.dec_num + "_")^1 +
-                     "0b" * (l.dec_num + "_")^1 + l.integer)
+local lex = lexer.new(...)
 
 -- Keywords.
-local keyword = token(l.KEYWORD, word_match{
-  'abstract',   'alignof',    'as',       'become',   'box',
-  'break',      'const',      'continue', 'crate',    'do',
-  'else',       'enum',       'extern',   'false',    'final',
-  'fn',         'for',        'if',       'impl',     'in',
-  'let',        'loop',       'macro',    'match',    'mod',
-  'move',       'mut',        "offsetof", 'override', 'priv',
-  'proc',       'pub',        'pure',     'ref',      'return',
-  'Self',       'self',       'sizeof',   'static',   'struct',
-  'super',      'trait',      'true',     'type',     'typeof',
-  'unsafe',     'unsized',    'use',      'virtual',  'where',
-  'while',      'yield'
-})
+lex:add_rule('keyword', lex:tag(lexer.KEYWORD, lex:word_match(lexer.KEYWORD)))
 
--- Library types
-local library = token(l.LABEL, l.upper * (l.lower + l.dec_num)^1)
-
--- syntax extensions
-local extension = l.word^1 * S("!")
-
-local func = token(l.FUNCTION, extension)
+-- Library types.
+lex:add_rule('library', lex:tag(lexer.TYPE, lexer.upper * (lexer.lower + lexer.dec_num)^1))
 
 -- Types.
-local type = token(l.TYPE, word_match{
-  '()', 'bool', 'isize', 'usize', 'char', 'str',
-  'u8', 'u16', 'u32', 'u64', 'i8', 'i16', 'i32', 'i64',
-  'f32','f64',
-})
+lex:add_rule('type', lex:tag(lexer.TYPE, lex:word_match(lexer.TYPE)))
+
+-- Lifetime annotation.
+lex:add_rule('lifetime', lex:tag(lexer.OPERATOR, S('<&') * P("'")))
+
+-- Strings.
+local sq_str = P('b')^-1 * lexer.range("'", true)
+local dq_str = P('b')^-1 * lexer.range('"')
+local raw_str = Cmt(P('b')^-1 * P('r') * C(P('#')^0) * '"', function(input, index, hashes)
+  local _, e = input:find('"' .. hashes, index, true)
+  return (e or #input) + 1
+end)
+lex:add_rule('string', lex:tag(lexer.STRING, sq_str + dq_str + raw_str))
+
+-- Functions.
+local builtin_macros = lex:tag(lexer.FUNCTION_BUILTIN, lex:word_match(lexer.FUNCTION_BUILTIN) * '!')
+local macros = lex:tag(lexer.FUNCTION, lexer.word * '!')
+local func = lex:tag(lexer.FUNCTION, lexer.word)
+lex:add_rule('function', (builtin_macros + macros + func) * #(lexer.space^0 * '('))
 
 -- Identifiers.
-local identifier = token(l.IDENTIFIER, l.word)
+local identifier = P('r#')^-1 * lexer.word
+lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER, identifier))
 
--- Operators.
-local operator = token(l.OPERATOR, S('+-/*%<>!=`^~@&|?#~:;,.()[]{}'))
+-- Comments.
+local line_comment = lexer.to_eol('//', true)
+local block_comment = lexer.range('/*', '*/', false, false, true)
+lex:add_rule('comment', lex:tag(lexer.COMMENT, line_comment + block_comment))
+
+-- Numbers.
+lex:add_rule('number', lex:tag(lexer.NUMBER, lexer.number_('_')))
 
 -- Attributes.
-local attribute = token(l.PREPROCESSOR, "#[" *
-                        (l.nonnewline - ']')^0 * P("]")^-1)
+lex:add_rule('preprocessor', lex:tag(lexer.PREPROCESSOR, '#' * lexer.range('[', ']', true)))
 
-M._rules = {
-  {'whitespace', ws},
-  {'keyword', keyword},
-  {'function', func},
-  {'library', library},
-  {'type', type},
-  {'identifier', identifier},
-  {'string', string},
-  {'comment', comment},
-  {'number', number},
-  {'operator', operator},
-  {'preprocessor', attribute},
-}
+-- Operators.
+lex:add_rule('operator', lex:tag(lexer.OPERATOR, S('+-/*%<>!=`^~@&|?#~:;,.()[]{}')))
 
-M._foldsymbols = {
-  _patterns = {'%l+', '[{}]', '/%*', '%*/', '//'},
-  [l.COMMENT] = {['/*'] = 1, ['*/'] = -1, ['//'] = l.fold_line_comments('//')},
-  [l.OPERATOR] = {['('] = 1, ['{'] = 1, [')'] = -1, ['}'] = -1}
-}
+-- Fold points.
+lex:add_fold_point(lexer.COMMENT, '/*', '*/')
+lex:add_fold_point(lexer.OPERATOR, '(', ')')
+lex:add_fold_point(lexer.OPERATOR, '{', '}')
 
-return M
+-- https://doc.rust-lang.org/std/#keywords
+lex:set_word_list(lexer.KEYWORD, {
+  'SelfTy', 'as', 'async', 'await', 'break', 'const', 'continue', 'crate', 'dyn', 'else', 'enum',
+  'extern', 'false', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop', 'match', 'mod', 'move', 'mut',
+  'pub', 'ref', 'return', 'self', 'static', 'struct', 'super', 'trait', 'true', 'type', 'union',
+  'unsafe', 'use', 'where', 'while'
+})
+
+-- https://doc.rust-lang.org/std/#primitives
+lex:set_word_list(lexer.TYPE, {
+  'never', 'array', 'bool', 'char', 'f32', 'f64', 'fn', 'i8', 'i16', 'i32', 'i64', 'i128', 'isize',
+  'pointer', 'reference', 'slice', 'str', 'tuple', 'u8', 'u16', 'u32', 'u64', 'u128', 'unit',
+  'usize'
+})
+
+lex:set_word_list(lexer.FUNCTION_BUILTIN, {
+  'assert', 'assert_eq', 'assert_ne', 'cfg', 'column', 'compile_error', 'concat', 'dbg',
+  'debug_assert', 'debug_assert_eq', 'debug_assert_ne', 'env', 'eprint', 'eprintln', 'file',
+  'format', 'format_args', 'include', 'include_bytes', 'include_str', 'line', 'matches',
+  'module_path', 'option_env', 'panic', 'print', 'println', 'stringify', 'thread_local', 'todo',
+  'unimplemented', 'unreachable', 'vec', 'write', 'writeln',
+  -- Experimental
+  'concat_bytes', 'concat_idents', 'const_format_args', 'format_args_nl', 'log_syntax',
+  'trace_macros',
+  -- Deprecated
+  'try'
+})
+
+lexer.property['scintillua.comment'] = '//'
+
+return lex

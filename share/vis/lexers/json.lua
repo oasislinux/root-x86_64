@@ -1,47 +1,28 @@
--- Copyright 2006-2017 Brian "Sir Alaran" Schott. See LICENSE.
+-- Copyright 2006-2024 Brian "Sir Alaran" Schott. See LICENSE.
 -- JSON LPeg lexer.
 -- Based off of lexer code by Mitchell.
 
-local l = require('lexer')
-local token, word_match = l.token, l.word_match
-local P, R, S = lpeg.P, lpeg.R, lpeg.S
+local lexer = lexer
+local P, S = lpeg.P, lpeg.S
 
-local M = {_NAME = 'json'}
-
--- Whitespace.
-local ws = token(l.WHITESPACE, l.space^1)
-
--- Comments.
-local comment = token(l.COMMENT, '/*' * (l.any - '*/')^0 * P('*/')^-1)
+local lex = lexer.new(...)
 
 -- Strings.
-local sq_str = P('u')^-1 * l.delimited_range("'", true)
-local dq_str = P('U')^-1 * l.delimited_range('"', true)
-local string = token(l.STRING, sq_str + dq_str)
-
--- Numbers.
-local integer = S('+-')^-1 * l.digit^1 * S('Ll')^-1
-local number = token(l.NUMBER, l.float + integer)
+local sq_str = lexer.range("'", true)
+local dq_str = lexer.range('"', true)
+lex:add_rule('string', lex:tag(lexer.STRING, sq_str + dq_str))
 
 -- Keywords.
-local keyword = token(l.KEYWORD, word_match{"true", "false", "null"})
+lex:add_rule('keyword', lex:tag(lexer.KEYWORD, lexer.word_match('true false null')))
+
+-- Numbers.
+lex:add_rule('number', lex:tag(lexer.NUMBER, lexer.number))
 
 -- Operators.
-local operator = token(l.OPERATOR, S('[]{}:,'))
+lex:add_rule('operator', lex:tag(lexer.OPERATOR, S('[]{}:,')))
 
-M._rules = {
-  {'whitespace', ws},
-  {'comment', comment},
-  {'string', string},
-  {'number', number},
-  {'keyword', keyword},
-  {'operator', operator},
-}
+-- Fold points.
+lex:add_fold_point(lexer.OPERATOR, '[', ']')
+lex:add_fold_point(lexer.OPERATOR, '{', '}')
 
-M._foldsymbols = {
-  _patterns = {'[%[%]{}]', '/%*', '%*/'},
-  [l.OPERATOR] = {['['] = 1, [']'] = -1, ['{'] = 1, ['}'] = -1},
-  [l.COMMENT] = {['/*'] = 1, ['*/'] = -1}
-}
-
-return M
+return lex

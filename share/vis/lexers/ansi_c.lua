@@ -1,154 +1,199 @@
--- Copyright 2006-2017 Mitchell mitchell.att.foicica.com. See LICENSE.
+-- Copyright 2006-2024 Mitchell. See LICENSE.
 -- C LPeg lexer.
 
-local l = require('lexer')
-local token, word_match = l.token, l.word_match
-local P, R, S = lpeg.P, lpeg.R, lpeg.S
+local lexer = lexer
+local P, S, B = lpeg.P, lpeg.S, lpeg.B
 
-local M = {_NAME = 'ansi_c'}
-
--- Whitespace.
-local ws = token(l.WHITESPACE, l.space^1)
-
--- Comments.
-local line_comment = '//' * l.nonnewline_esc^0
-local block_comment = '/*' * (l.any - '*/')^0 * P('*/')^-1
--- local preproc_ifzero = l.starts_line('#if') * S(' \t')^0 * '0' * l.space *
---                       (l.starts_line('#endif'))
-local comment = token(l.COMMENT, line_comment + block_comment)
-
--- Strings.
-local sq_str = P('L')^-1 * l.delimited_range("'", true)
-local dq_str = P('L')^-1 * l.delimited_range('"', true)
-local string = token(l.STRING, sq_str + dq_str)
-
--- Numbers.
-local float_suffix = P('f')^-1
-local integer_suffix = (S('uU')^-1 * word_match{ 'l', 'L', 'll', 'LL' }^-1) +
-                       (word_match{ 'l', 'L', 'll', 'LL' }^-1 * S('uU')^-1)
-local number = token(l.NUMBER, (l.float * float_suffix) +
-                               (l.integer * integer_suffix))
-
--- Preprocessor.
-local preproc_word = word_match{
-  'define', 'elif', 'else', 'endif', 'error', 'if', 'ifdef', 'ifndef', 'line',
-  'pragma', 'undef', 'warning'
-}
-
-local preproc = #l.starts_line('#') *
-                (token(l.PREPROCESSOR, '#' * S('\t ')^0 * preproc_word) +
-                 token(l.PREPROCESSOR, '#' * S('\t ')^0 * 'include') *
-                 (token(l.WHITESPACE, S('\t ')^0) *
-                  token(l.STRING, l.delimited_range('<>', true, true)))^-1)
+local lex = lexer.new(...)
 
 -- Keywords.
-local storage_class = word_match{
-  -- C11 6.7.1
-  'typedef', 'extern', 'static', '_Thread_local', 'auto', 'register',
-}
-
-local type_qualifier = word_match{
-  -- C11 6.7.3
-  'const', 'restrict', 'volatile', '_Atomic',
-}
-
-local function_specifier = word_match{
-  -- C11 6.7.4
-  'inline', '_Noreturn',
-}
-
-local extra_keywords = word_match{
-   'asm', '__asm', '__asm__', '__restrict__', '__inline', '__inline__',
-   '__attribute__', '__declspec'
-}
-
-local keyword = token(l.KEYWORD, word_match{
-  'break', 'case', 'continue', 'default', 'do', 'else', 'enum', 'for', 'goto',
-  'if', 'return', 'switch', 'while',
-  '_Alignas', '_Generic', '_Static_assert',
-} + storage_class + type_qualifier + function_specifier + extra_keywords)
-
--- Constants.
-local errno = word_match{
-  -- http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/errno.h.html
-  'E2BIG', 'EACCES', 'EADDRINUSE', 'EADDRNOTAVAIL', 'EAFNOSUPPORT', 
-  'EAGAIN', 'EALREADY', 'EBADF', 'EBADMSG', 'EBUSY', 'ECANCELED', 'ECHILD',
-  'ECONNABORTED', 'ECONNREFUSED', 'ECONNRESET', 'EDEADLK', 'EDESTADDRREQ',
-  'EDOM', 'EDQUOT', 'EEXIST', 'EFAULT', 'EFBIG', 'EHOSTUNREACH', 'EIDRM',
-  'EILSEQ', 'EINPROGRESS', 'EINTR', 'EINVAL', 'EIO', 'EISCONN', 'EISDIR',
-  'ELOOP', 'EMFILE', 'EMLINK', 'EMSGSIZE', 'EMULTIHOP', 'ENAMETOOLONG',
-  'ENETDOWN', 'ENETRESET', 'ENETUNREACH', 'ENFILE', 'ENOBUFS', 'ENODATA',
-  'ENODEV', 'ENOENT', 'ENOEXEC', 'ENOLCK', 'ENOLINK', 'ENOMEM',
-  'ENOMSG', 'ENOPROTOOPT', 'ENOSPC', 'ENOSR', 'ENOSTR', 'ENOSYS',
-  'ENOTCONN', 'ENOTDIR', 'ENOTEMPTY', 'ENOTRECOVERABLE', 'ENOTSOCK',
-  'ENOTSUP', 'ENOTTY', 'ENXIO', 'EOPNOTSUPP', 'EOVERFLOW', 'EOWNERDEAD',
-  'EPERM', 'EPIPE', 'EPROTO', 'EPROTONOSUPPORT', 'EPROTOTYPE', 'ERANGE',
-  'EROFS', 'ESPIPE', 'ESRCH', 'ESTALE', 'ETIME', 'ETIMEDOUT', 'ETXTBSY',
-  'EWOULDBLOCK', 'EXDEV',
-}
-
-local preproc_macros = word_match{
-  -- C11 6.10.8.1 Mandatory macros
-  '__DATE__', '__FILE__', '__LINE__', '__TIME__',
-  -- C11 6.4.2.2 Predefined identifiers
-  '__func__',
-}
-
-local constant = token(l.CONSTANT, word_match{
-  'true', 'false',
-  'NULL', 'CHAR_BIT', 'SIZE_MAX', } +
-  ((P('WINT') + P('WCHAR') + P('SIG_ATOMIC') + P('PTRDIFF')) * (P('_MIN') + P('_MAX'))) +
-  ( P('INT') * (((P('_LEAST') + P('_FAST'))^-1 * l.dec_num^1) + P('MAX') + P('PTR')) * (P('_MIN') + P('_MAX'))) +
-  (P('UINT') * (((P('_LEAST') + P('_FAST'))^-1 * l.dec_num^1) + P('MAX') + P('PTR')) *  P('_MAX')) +
-  errno + preproc_macros
-)
+lex:add_rule('keyword', lex:tag(lexer.KEYWORD, lex:word_match(lexer.KEYWORD)))
 
 -- Types.
-local type = token(l.TYPE, word_match{
-  'bool', 'char', 'double', 'float', 'int', 'long', 'short',
-  'signed', 'struct', 'union', 'unsigned', 'void', '_Bool', '_Complex',
-  '_Imaginary', 'ptrdiff_t', 'size_t', 'max_align_t', 'wchar_t',
-  'intptr_t', 'uintptr_t', 'intmax_t', 'uintmax_t'} +
-  (P('u')^-1 * P('int') * (P('_least') + P('_fast'))^-1 * l.dec_num^1 * P('_t')) +
-  (S('usif') * l.dec_num^1 * P('_t')) +
-  (P('__')^-1 * S('usif') * l.dec_num^1)
-)
+lex:add_rule('type', lex:tag(lexer.TYPE, lex:word_match(lexer.TYPE)))
+
+-- Functions.
+local builtin_func = -(B('.') + B('->')) *
+  lex:tag(lexer.FUNCTION_BUILTIN, lex:word_match(lexer.FUNCTION_BUILTIN))
+local func = lex:tag(lexer.FUNCTION, lexer.word)
+local method = (B('.') + B('->')) * lex:tag(lexer.FUNCTION_METHOD, lexer.word)
+lex:add_rule('function', (builtin_func + method + func) * #(lexer.space^0 * '('))
+
+-- Constants.
+lex:add_rule('constants', lex:tag(lexer.CONSTANT_BUILTIN,
+  -(B('.') + B('->')) * lex:word_match(lexer.CONSTANT_BUILTIN)))
 
 -- Labels.
--- FIXME: Accept whitespace before label.
-local label = token(l.LABEL, l.starts_line(l.word * ':'))
+lex:add_rule('label', lex:tag(lexer.LABEL, lexer.starts_line(lexer.word * ':')))
+
+-- Strings.
+local sq_str = lexer.range("'", true)
+local dq_str = lexer.range('"', true)
+lex:add_rule('string', lex:tag(lexer.STRING, P('L')^-1 * (sq_str + dq_str)))
 
 -- Identifiers.
-local identifier = token(l.IDENTIFIER, l.word)
+lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER, lexer.word))
+
+-- Comments.
+local line_comment = lexer.to_eol('//', true)
+local block_comment = lexer.range('/*', '*/') +
+  lexer.range('#if' * S(' \t')^0 * '0' * lexer.space, '#endif')
+lex:add_rule('comment', lex:tag(lexer.COMMENT, line_comment + block_comment))
+
+-- Numbers.
+local integer = lexer.integer * lexer.word_match('u l ll ul ull lu llu', true)^-1
+local float = lexer.float * P('f')^-1
+lex:add_rule('number', lex:tag(lexer.NUMBER, float + integer))
+
+-- Preprocessor.
+local include = lex:tag(lexer.PREPROCESSOR, '#' * S('\t ')^0 * 'include') *
+  (lex:get_rule('whitespace') * lex:tag(lexer.STRING, lexer.range('<', '>', true)))^-1
+local preproc = lex:tag(lexer.PREPROCESSOR, '#' * S('\t ')^0 * lex:word_match(lexer.PREPROCESSOR))
+lex:add_rule('preprocessor', include + preproc)
 
 -- Operators.
-local operator = token(l.OPERATOR,
-  S('+-/*%<>~!=^&|?~:;,.()[]{}') +
-  word_match{ 'sizeof', '_Alignof' }
-)
+lex:add_rule('operator', lex:tag(lexer.OPERATOR, S('+-/*%<>~!=^&|?~:;,.()[]{}')))
 
-M._rules = {
-  {'whitespace', ws},
-  {'comment', comment},
-  {'keyword', keyword},
-  {'type', type},
-  {'constant', constant},
-  {'operator', operator},
-  {'label', label},
-  {'identifier', identifier},
-  {'string', string},
-  {'number', number},
-  {'preproc', preproc},
-}
+-- Fold points.
+lex:add_fold_point(lexer.PREPROCESSOR, '#if', '#endif')
+lex:add_fold_point(lexer.PREPROCESSOR, '#ifdef', '#endif')
+lex:add_fold_point(lexer.PREPROCESSOR, '#ifndef', '#endif')
+lex:add_fold_point(lexer.OPERATOR, '{', '}')
+lex:add_fold_point(lexer.COMMENT, '/*', '*/')
 
-M._foldsymbols = {
-  _patterns = {'#?%l+', '[{}]', '/%*', '%*/', '//'},
-  [l.PREPROCESSOR] = {['if'] = 1, ifdef = 1, ifndef = 1, endif = -1},
-  [l.OPERATOR] = {['{'] = 1, ['}'] = -1},
-  [l.COMMENT] = {
-    ['/*'] = 1, ['*/'] = -1, ['//'] = l.fold_line_comments('//'),
-    ['#if'] = 1, ['#endif'] = -1
-  }
-}
+-- Word lists.
+lex:set_word_list(lexer.KEYWORD, {
+  'auto', 'break', 'case', 'const', 'continue', 'default', 'do', 'else', 'enum', 'extern', 'for',
+  'goto', 'if', 'inline', 'register', 'restrict', 'return', 'sizeof', 'static', 'switch', 'typedef',
+  'volatile', 'while', --
+  'false', 'true', -- C99
+  'alignas', 'alignof', '_Atomic', '_Generic', 'noreturn', '_Static_assert', 'thread_local', -- C11
+  -- Compiler.
+  'asm', '__asm', '__asm__', '__restrict__', '__inline', '__inline__', '__attribute__', '__declspec'
+})
 
-return M
+lex:set_word_list(lexer.TYPE, {
+  'bool', 'char', 'double', 'float', 'int', 'long', 'short', 'signed', 'struct', 'union',
+  'unsigned', 'void', --
+  'complex', 'imaginary', '_Complex', '_Imaginary', -- complex.h C99
+  'lconv', -- locale.h
+  'div_t', -- math.h
+  'va_list', -- stdarg.h
+  'bool', '_Bool', -- stdbool.h C99
+  -- stddef.h.
+  'size_t', 'ptrdiff_t', --
+  'max_align_t', -- C11
+  -- stdint.h.
+  'int8_t', 'int16_t', 'int32_t', 'int64_t', 'int_fast8_t', 'int_fast16_t', 'int_fast32_t',
+  'int_fast64_t', 'int_least8_t', 'int_least16_t', 'int_least32_t', 'int_least64_t', 'intmax_t',
+  'intptr_t', 'uint8_t', 'uint16_t', 'uint32_t', 'uint64_t', 'uint_fast8_t', 'uint_fast16_t',
+  'uint_fast32_t', 'uint_fast64_t', 'uint_least8_t', 'uint_least16_t', 'uint_least32_t',
+  'uint_least64_t', 'uintmax_t', 'uintptr_t', --
+  'FILE', 'fpos_t', -- stdio.h
+  'div_t', 'ldiv_t', -- stdlib.h
+  -- time.h.
+  'tm', 'time_t', 'clock_t', --
+  'timespec' -- C11
+})
+
+lex:set_word_list(lexer.FUNCTION_BUILTIN, {
+  'assert', -- assert.h
+  -- complex.h.
+  'CMPLX', 'creal', 'cimag', 'cabs', 'carg', 'conj', 'cproj',
+  -- C99
+  'cexp', 'cpow', 'csin', 'ccos', 'ctan', 'casin', 'cacos', 'catan', 'csinh', 'ccosh', 'ctanh',
+  'casinh', 'cacosh', 'catanh',
+  -- ctype.h.
+  'isalnum', 'isalpha', 'islower', 'isupper', 'isdigit', 'isxdigit', 'iscntrl', 'isgraph',
+  'isspace', 'isprint', 'ispunct', 'tolower', 'toupper', --
+  'isblank', -- C99
+  -- inttypes.h.
+  'INT8_C', 'INT16_C', 'INT32_C', 'INT64_C', 'INTMAX_C', 'UINT8_C', 'UINT16_C', 'UINT32_C',
+  'UINT64_C', 'UINTMAX_C', --
+  'setlocale', 'localeconv', -- locale.h
+  -- math.h.
+  'abs', 'div', 'fabs', 'fmod', 'exp', 'log', 'log10', 'pow', 'sqrt', 'sin', 'cos', 'tan', 'asin',
+  'acos', 'atan', 'atan2', 'sinh', 'cosh', 'tanh', 'ceil', 'floor', 'frexp', 'ldexp', 'modf',
+  -- C99.
+  'remainder', 'remquo', 'fma', 'fmax', 'fmin', 'fdim', 'nan', 'exp2', 'expm1', 'log2', 'log1p',
+  'cbrt', 'hypot', 'asinh', 'acosh', 'atanh', 'erf', 'erfc', 'tgamma', 'lgamma', 'trunc', 'round',
+  'nearbyint', 'rint', 'scalbn', 'ilogb', 'logb', 'nextafter', 'nexttoward', 'copysign', 'isfinite',
+  'isinf', 'isnan', 'isnormal', 'signbit', 'isgreater', 'isgreaterequal', 'isless', 'islessequal',
+  'islessgreater', 'isunordered', --
+  'strtoimax', 'strtoumax', -- inttypes.h C99
+  'signal', 'raise', -- signal.h
+  'setjmp', 'longjmp', -- setjmp.h
+  'va_start', 'va_arg', 'va_end', -- stdarg.h
+  -- stdio.h.
+  'fopen', 'freopen', 'fclose', 'fflush', 'setbuf', 'setvbuf', 'fwide', 'fread', 'fwrite', 'fgetc',
+  'getc', 'fgets', 'fputc', 'putc', 'getchar', 'gets', 'putchar', 'puts', 'ungetc', 'scanf',
+  'fscanf', 'sscanf', 'printf', 'fprintf', 'sprintf', 'vprintf', 'vfprintf', 'vsprintf', 'ftell',
+  'fgetpos', 'fseek', 'fsetpos', 'rewind', 'clearerr', 'feof', 'ferror', 'perror', 'remove',
+  'rename', 'tmpfile', 'tmpnam',
+  -- stdlib.h.
+  'abort', 'exit', 'atexit', 'system', 'getenv', 'malloc', 'calloc', 'realloc', 'free', 'atof',
+  'atoi', 'atol', 'strtol', 'strtoul', 'strtod', 'mblen', 'mbsinit', 'mbrlen', 'qsort', 'bsearch',
+  'rand', 'srand', --
+  'quick_exit', '_Exit', 'at_quick_exit', 'aligned_alloc', -- C11
+  -- string.h.
+  'strcpy', 'strncpy', 'strcat', 'strncat', 'strxfrm', 'strlen', 'strcmp', 'strncmp', 'strcoll',
+  'strchr', 'strrchr', 'strspn', 'strcspn', 'strpbrk', 'strstr', 'strtok', 'memchr', 'memcmp',
+  'memset', 'memcpy', 'memmove', 'strerror',
+  -- time.h.
+  'difftime', 'time', 'clock', 'asctime', 'ctime', 'gmtime', 'localtime', 'mktime', --
+  'timespec_get' -- C11
+})
+
+lex:set_word_list(lexer.CONSTANT_BUILTIN, {
+  'NULL', --
+  '__DATE__', '__FILE__', '__LINE__', '__TIME__', '__func__', -- preprocessor
+  -- errno.h.
+  'errno', --
+  'E2BIG', 'EACCES', 'EADDRINUSE', 'EADDRNOTAVAIL', 'EAFNOSUPPORT', 'EAGAIN', 'EALREADY', 'EBADF',
+  'EBADMSG', 'EBUSY', 'ECANCELED', 'ECHILD', 'ECONNABORTED', 'ECONNREFUSED', 'ECONNRESET',
+  'EDEADLK', 'EDESTADDRREQ', 'EDOM', 'EDQUOT', 'EEXIST', 'EFAULT', 'EFBIG', 'EHOSTUNREACH', 'EIDRM',
+  'EILSEQ', 'EINPROGRESS', 'EINTR', 'EINVAL', 'EIO', 'EISCONN', 'EISDIR', 'ELOOP', 'EMFILE',
+  'EMLINK', 'EMSGSIZE', 'EMULTIHOP', 'ENAMETOOLONG', 'ENETDOWN', 'ENETRESET', 'ENETUNREACH',
+  'ENFILE', 'ENOBUFS', 'ENODATA', 'ENODEV', 'ENOENT', 'ENOEXEC', 'ENOLCK', 'ENOLINK', 'ENOMEM',
+  'ENOMSG', 'ENOPROTOOPT', 'ENOSPC', 'ENOSR', 'ENOSTR', 'ENOSYS', 'ENOTCONN', 'ENOTDIR',
+  'ENOTEMPTY', 'ENOTRECOVERABLE', 'ENOTSOCK', 'ENOTSUP', 'ENOTTY', 'ENXIO', 'EOPNOTSUPP',
+  'EOVERFLOW', 'EOWNERDEAD', 'EPERM', 'EPIPE', 'EPROTO', 'EPROTONOSUPPORT', 'EPROTOTYPE', 'ERANGE',
+  'EROFS', 'ESPIPE', 'ESRCH', 'ESTALE', 'ETIME', 'ETIMEDOUT', 'ETXTBSY', 'EWOULDBLOCK', 'EXDEV',
+  -- float.h.
+  'FLT_MIN', 'DBL_MIN', 'LDBL_MIN', 'FLT_MAX', 'DBL_MAX', 'LDBL_MAX',
+  -- limits.h.
+  'CHAR_BIT', 'MB_LEN_MAX', 'CHAR_MIN', 'CHAR_MAX', 'SCHAR_MIN', 'SHRT_MIN', 'INT_MIN', 'LONG_MIN',
+  'SCHAR_MAX', 'SHRT_MAX', 'INT_MAX', 'LONG_MAX', 'UCHAR_MAX', 'USHRT_MAX', 'UINT_MAX', 'ULONG_MAX',
+  -- C99.
+  'LLONG_MIN', 'ULLONG_MAX', 'PTRDIFF_MIN', 'PTRDIFF_MAX', 'SIZE_MAX', 'SIG_ATOMIC_MIN',
+  'SIG_ATOMIC_MAX', 'WINT_MIN', 'WINT_MAX', 'WCHAR_MIN', 'WCHAR_MAX', --
+  'LC_ALL', 'LC_COLLATE', 'LC_CTYPE', 'LC_MONETARY', 'LC_NUMERIC', 'LC_TIME', -- locale.h
+  -- math.h.
+  'HUGE_VAL', --
+  'INFINITY', 'NAN', -- C99
+  -- stdint.h.
+  'INT8_MIN', 'INT16_MIN', 'INT32_MIN', 'INT64_MIN', 'INT_FAST8_MIN', 'INT_FAST16_MIN',
+  'INT_FAST32_MIN', 'INT_FAST64_MIN', 'INT_LEAST8_MIN', 'INT_LEAST16_MIN', 'INT_LEAST32_MIN',
+  'INT_LEAST64_MIN', 'INTPTR_MIN', 'INTMAX_MIN', 'INT8_MAX', 'INT16_MAX', 'INT32_MAX', 'INT64_MAX',
+  'INT_FAST8_MAX', 'INT_FAST16_MAX', 'INT_FAST32_MAX', 'INT_FAST64_MAX', 'INT_LEAST8_MAX',
+  'INT_LEAST16_MAX', 'INT_LEAST32_MAX', 'INT_LEAST64_MAX', 'INTPTR_MAX', 'INTMAX_MAX', 'UINT8_MAX',
+  'UINT16_MAX', 'UINT32_MAX', 'UINT64_MAX', 'UINT_FAST8_MAX', 'UINT_FAST16_MAX', 'UINT_FAST32_MAX',
+  'UINT_FAST64_MAX', 'UINT_LEAST8_MAX', 'UINT_LEAST16_MAX', 'UINT_LEAST32_MAX', 'UINT_LEAST64_MAX',
+  'UINTPTR_MAX', 'UINTMAX_MAX',
+  -- stdio.h
+  'stdin', 'stdout', 'stderr', 'EOF', 'FOPEN_MAX', 'FILENAME_MAX', 'BUFSIZ', '_IOFBF', '_IOLBF',
+  '_IONBF', 'SEEK_SET', 'SEEK_CUR', 'SEEK_END', 'TMP_MAX', --
+  'EXIT_SUCCESS', 'EXIT_FAILURE', 'RAND_MAX', -- stdlib.h
+  -- signal.h.
+  'SIG_DFL', 'SIG_IGN', 'SIG_ERR', 'SIGABRT', 'SIGFPE', 'SIGILL', 'SIGINT', 'SIGSEGV', 'SIGTERM', --
+  'CLOCKS_PER_SEC' -- time.h.
+})
+
+lex:set_word_list(lexer.PREPROCESSOR, {
+  'define', 'defined', 'elif', 'else', 'endif', 'error', 'if', 'ifdef', 'ifndef', 'line', 'pragma',
+  'undef'
+})
+
+lexer.property['scintillua.comment'] = '//'
+
+return lex

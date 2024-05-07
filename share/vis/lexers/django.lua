@@ -1,77 +1,63 @@
--- Copyright 2006-2017 Mitchell mitchell.att.foicica.com. See LICENSE.
+-- Copyright 2006-2024 Mitchell. See LICENSE.
 -- Django LPeg lexer.
 
-local l = require('lexer')
-local token, word_match = l.token, l.word_match
-local P, R, S, V = lpeg.P, lpeg.R, lpeg.S, lpeg.V
+local lexer = lexer
+local P, S = lpeg.P, lpeg.S
 
-local M = {_NAME = 'django'}
-
--- Whitespace.
-local ws = token(l.WHITESPACE, l.space^1)
-
--- Comments.
-local comment = token(l.COMMENT, '{#' * (l.any - l.newline - '#}')^0 *
-                                 P('#}')^-1)
-
--- Strings.
-local string = token(l.STRING, l.delimited_range('"', false, true))
+local lex = lexer.new(...)
 
 -- Keywords.
-local keyword = token(l.KEYWORD, word_match{
-  'as', 'block', 'blocktrans', 'by', 'endblock', 'endblocktrans', 'comment',
-  'endcomment', 'cycle', 'date', 'debug', 'else', 'extends', 'filter',
-  'endfilter', 'firstof', 'for', 'endfor', 'if', 'endif', 'ifchanged',
-  'endifchanged', 'ifnotequal', 'endifnotequal', 'in', 'load', 'not', 'now',
-  'or', 'parsed', 'regroup', 'ssi', 'trans', 'with', 'widthratio'
-})
+lex:add_rule('keyword', lex:tag(lexer.KEYWORD, lex:word_match(lexer.KEYWORD)))
 
 -- Functions.
-local func = token(l.FUNCTION, word_match{
-  'add', 'addslashes', 'capfirst', 'center', 'cut', 'date', 'default',
-  'dictsort', 'dictsortreversed', 'divisibleby', 'escape', 'filesizeformat',
-  'first', 'fix_ampersands', 'floatformat', 'get_digit', 'join', 'length',
-  'length_is', 'linebreaks', 'linebreaksbr', 'linenumbers', 'ljust', 'lower',
-  'make_list', 'phone2numeric', 'pluralize', 'pprint', 'random', 'removetags',
-  'rjust', 'slice', 'slugify', 'stringformat', 'striptags', 'time', 'timesince',
-  'title', 'truncatewords', 'unordered_list', 'upper', 'urlencode', 'urlize',
-  'urlizetrunc', 'wordcount', 'wordwrap', 'yesno',
-})
+lex:add_rule('function',
+  lpeg.B('|') * lex:tag(lexer.FUNCTION_BUILTIN, lex:word_match(lexer.FUNCTION_BUILTIN)))
 
 -- Identifiers.
-local identifier = token(l.IDENTIFIER, l.word)
+lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER, lexer.word))
+
+-- Strings.
+lex:add_rule('string', lex:tag(lexer.STRING, lexer.range('"', false, false)))
 
 -- Operators.
-local operator = token(l.OPERATOR, S(':,.|'))
+lex:add_rule('operator', lex:tag(lexer.OPERATOR, S(':,.|')))
 
-M._rules = {
-  {'whitespace', ws},
-  {'keyword', keyword},
-  {'function', func},
-  {'identifier', identifier},
-  {'string', string},
-  {'comment', comment},
-  {'operator', operator},
-}
+-- Embed Django in HTML.
+local html = lexer.load('html')
+html:add_rule('django_comment', lex:tag(lexer.COMMENT, lexer.range('{#', '#}', true)))
+local django_start_rule = lex:tag(lexer.PREPROCESSOR, '{' * S('{%'))
+local django_end_rule = lex:tag(lexer.PREPROCESSOR, S('%}') * '}')
+html:embed(lex, django_start_rule, django_end_rule)
 
--- Embedded in HTML.
-local html = l.load('html')
+-- Fold points.
+lex:add_fold_point(lexer.PREPROCESSOR, '{{', '}}')
+lex:add_fold_point(lexer.PREPROCESSOR, '{%', '%}')
 
--- Embedded Django.
-local django_start_rule = token('django_tag', '{' * S('{%'))
-local django_end_rule = token('django_tag', S('%}') * '}')
-l.embed_lexer(html, M, django_start_rule, django_end_rule)
--- Modify HTML patterns to embed Django.
-html._RULES['comment'] = html._RULES['comment'] + comment
+-- Word lists.
+lex:set_word_list(lexer.KEYWORD, {
+  'autoescape', 'endautoescape', 'block', 'endblock', 'comment', 'endcomment', 'csrf_token',
+  'cycle', 'as', 'debug', 'extends', 'filter', 'endfilter', 'firstof', 'for', 'in', 'endfor',
+  'empty', 'if', 'elif', 'else', 'endif', 'and', 'or', 'not', 'is', 'ifchanged', 'endifchanged',
+  'include', 'load', 'lorem', 'now', 'regroup', 'resetcycle', 'spaceless', 'endspaceless',
+  'templatetag', 'url', 'verbatim', 'endverbatim', 'widthratio', 'with', 'endwith', --
+  'blocktranslate', 'endblocktranslate', 'translate', 'language', 'get_available_languages',
+  'get_current_language', 'get_current_language_bidi', 'get_language_info',
+  'get_language_info_list', --
+  'get_static_prefix', 'get_media_prefix'
+})
 
-M._tokenstyles = {
-  django_tag = l.STYLE_EMBEDDED
-}
+lex:set_word_list(lexer.FUNCTION_BUILTIN, {
+  'add', 'addslashes', 'capfirst', 'center', 'cut', 'date', 'default', 'default_if_none',
+  'dictsort', 'dictsortreversed', 'divisibleby', 'escape', 'escapejs', 'filesizeformat', 'first',
+  'floatformat', 'force_escape', 'get_digit', 'iriencode', 'join', 'json_script', 'last', 'length',
+  'length_is', 'linebreaks', 'linebreaksbr', 'linenumbers', 'ljust', 'lower', 'make_list',
+  'phone2numeric', 'pluralize', 'pprint', 'random', 'rjust', 'safe', 'safeseq', 'slice', 'slugify',
+  'stringformat', 'striptags', 'time', 'timesince', 'timeuntil', 'title', 'truncatechars_html',
+  'truncatewords', 'truncatewords_html', 'unordered_list', 'upper', 'urlencode', 'urlize',
+  'urlizetrunc', 'wordcount', 'wordwrap', 'yesno', --
+  'language_name', 'language_name_local', 'language_bidi', 'language_name_translated'
+})
 
-local _foldsymbols = html._foldsymbols
-_foldsymbols._patterns[#_foldsymbols._patterns + 1] = '{[%%{]'
-_foldsymbols._patterns[#_foldsymbols._patterns + 1] = '[%%}]}'
-_foldsymbols.django_tag = {['{{'] = 1, ['}}'] = -1, ['{%'] = 1, ['%}'] = -1}
-M._foldsymbols = _foldsymbols
+lexer.property['scintillua.comment'] = '{#|#}'
 
-return M
+return lex

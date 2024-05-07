@@ -1,71 +1,57 @@
--- Copyright 2006-2017 Mitchell mitchell.att.foicica.com. See LICENSE.
+-- Copyright 2006-2024 Mitchell. See LICENSE.
 -- Gtkrc LPeg lexer.
 
-local l = require('lexer')
-local token, word_match = l.token, l.word_match
-local P, R, S = lpeg.P, lpeg.R, lpeg.S
+local lexer = lexer
+local word_match = lexer.word_match
+local P, S = lpeg.P, lpeg.S
 
-local M = {_NAME = 'gtkrc'}
-
--- Whitespace.
-local ws = token(l.WHITESPACE, l.space^1)
-
--- Comments.
-local comment = token(l.COMMENT, '#' * l.nonnewline^0)
-
--- Strings.
-local sq_str = l.delimited_range("'", true)
-local dq_str = l.delimited_range('"', true)
-local string = token(l.STRING, sq_str + dq_str)
-
--- Numbers.
-local number = token(l.NUMBER, l.digit^1 * ('.' * l.digit^1)^-1)
+local lex = lexer.new(...)
 
 -- Keywords.
-local keyword = token(l.KEYWORD, word_match{
-  'binding', 'class', 'include', 'module_path', 'pixmap_path', 'im_module_file',
-  'style', 'widget', 'widget_class'
-})
+lex:add_rule('keyword', lex:tag(lexer.KEYWORD, word_match(
+  'binding class include module_path pixmap_path im_module_file style widget widget_class')))
 
 -- Variables.
-local variable = token(l.VARIABLE, word_match{
-  'bg', 'fg', 'base', 'text', 'xthickness', 'ythickness', 'bg_pixmap', 'font',
-  'fontset', 'font_name', 'stock', 'color', 'engine'
-})
+lex:add_rule('variable', lex:tag(lexer.VARIABLE_BUILTIN, lex:word_match(lexer.VARIABLE_BUILTIN)))
 
 -- States.
-local state = token(l.CONSTANT, word_match{
+lex:add_rule('state', lex:tag(lexer.CONSTANT_BUILTIN, lex:word_match(lexer.CONSTANT_BUILTIN)))
+
+-- Functions.
+lex:add_rule('function', lex:tag(lexer.FUNCTION_BUILTIN, lex:word_match(lexer.FUNCTION_BUILTIN)))
+
+-- Identifiers.
+lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER, lexer.alpha * (lexer.alnum + S('_-'))^0))
+
+-- Strings.
+local sq_str = lexer.range("'", true)
+local dq_str = lexer.range('"', true)
+lex:add_rule('string', lex:tag(lexer.STRING, sq_str + dq_str))
+
+-- Comments.
+lex:add_rule('comment', lex:tag(lexer.COMMENT, lexer.to_eol('#')))
+
+-- Numbers.
+lex:add_rule('number', lex:tag(lexer.NUMBER, lexer.digit^1 * ('.' * lexer.digit^1)^-1))
+
+-- Operators.
+lex:add_rule('operator', lex:tag(lexer.OPERATOR, S(':=,*()[]{}')))
+
+-- Fold points.
+lex:add_fold_point(lexer.OPERATOR, '{', '}')
+
+-- Word lists.
+lex:set_word_list(lexer.VARIABLE_BUILTIN, {
+  'bg', 'fg', 'base', 'text', 'xthickness', 'ythickness', 'bg_pixmap', 'font', 'fontset',
+  'font_name', 'stock', 'color', 'engine'
+})
+
+lex:set_word_list(lexer.CONSTANT_BUILTIN, {
   'ACTIVE', 'SELECTED', 'NORMAL', 'PRELIGHT', 'INSENSITIVE', 'TRUE', 'FALSE'
 })
 
--- Functions.
-local func = token(l.FUNCTION, word_match{
-  'mix', 'shade', 'lighter', 'darker'
-})
+lex:set_word_list(lexer.FUNCTION_BUILTIN, {'mix', 'shade', 'lighter', 'darker'})
 
--- Identifiers.
-local identifier = token(l.IDENTIFIER, l.alpha * (l.alnum + S('_-'))^0)
+lexer.property['scintillua.comment'] = '#'
 
--- Operators.
-local operator = token(l.OPERATOR, S(':=,*()[]{}'))
-
-M._rules = {
-  {'whitespace', ws},
-  {'keyword', keyword},
-  {'variable', variable},
-  {'state', state},
-  {'function', func},
-  {'identifier', identifier},
-  {'string', string},
-  {'comment', comment},
-  {'number', number},
-  {'operator', operator},
-}
-
-M._foldsymbols = {
-  _patterns = {'[{}]', '#'},
-  [l.OPERATOR] = {['{'] = 1, ['}'] = -1},
-  [l.COMMENT] = {['#'] = l.fold_line_comments('#')}
-}
-
-return M
+return lex

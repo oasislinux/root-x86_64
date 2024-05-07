@@ -2,9 +2,9 @@
 
 vis.events.subscribe(vis.events.INIT, function()
 	if os.getenv("TERM_PROGRAM") == "Apple_Terminal" then
-		vis:command("set change-256colors false");
+		vis:command("set change256colors false")
 	end
-	vis:command("set theme ".. (vis.ui.colors <= 16 and "default-16" or "default-256"))
+	vis:command("set theme default")
 end)
 
 vis:option_register("theme", "string", function(name)
@@ -14,7 +14,18 @@ vis:option_register("theme", "string", function(name)
 		require(theme)
 	end
 
-	vis.lexers.lexers = {}
+	local lexers = vis.lexers
+	lexers.lexers = {}
+
+	if not lexers.load then return false end
+	if not lexers.property then lexers.load("text") end
+	local colors = lexers.colors
+	local default_colors = { "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white" }
+	for _, c in ipairs(default_colors) do
+		if not colors[c] or colors[c] == '' then
+			colors[c] = c
+		end
+	end
 
 	for win in vis:windows() do
 		win:set_syntax(win.syntax)
@@ -37,37 +48,23 @@ vis:option_register("horizon", "number", function(horizon)
 	return true
 end, "Number of bytes to consider for syntax highlighting")
 
-vis:option_register("redrawtime", "string", function(redrawtime)
-	if not vis.win then return false end
-	local value = tonumber(redrawtime)
-	if not value or value <= 0 then
-		vis:info("A positive real number expected")
-		return false
-	end
-	vis.win.redrawtime = value
-	return true
-end, "Seconds to wait for syntax highlighting before aborting it")
-
 vis.events.subscribe(vis.events.WIN_HIGHLIGHT, function(win)
 	if not win.syntax or not vis.lexers.load then return end
 	local lexer = vis.lexers.load(win.syntax, nil, true)
 	if not lexer then return end
 
 	-- TODO: improve heuristic for initial style
-	local viewport = win.viewport
+	local viewport = win.viewport.bytes
 	if not viewport then return end
-	local redrawtime_max = win.redrawtime or 1.0
 	local horizon_max = win.horizon or 32768
 	local horizon = viewport.start < horizon_max and viewport.start or horizon_max
 	local view_start = viewport.start
 	local lex_start = viewport.start - horizon
 	viewport.start = lex_start
 	local data = win.file:content(viewport)
-	local token_styles = lexer._TOKENSTYLES
-	local tokens, timedout = lexer:lex(data, 1, redrawtime_max)
+	local token_styles = lexer._TAGS
+	local tokens = lexer:lex(data, 1)
 	local token_end = lex_start + (tokens[#tokens] or 1) - 1
-
-	if timedout then return end
 
 	for i = #tokens - 1, 1, -2 do
 		local token_start = lex_start + (tokens[i-1] or 1) - 1

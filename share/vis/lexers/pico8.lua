@@ -1,53 +1,35 @@
--- Copyright 2016-2017 Alejandro Baez (https://keybase.io/baez). See LICENSE.
--- PICO-8 Lexer.
+-- Copyright 2016-2024 Alejandro Baez (https://keybase.io/baez). See LICENSE.
+-- PICO-8 lexer.
 -- http://www.lexaloffle.com/pico-8.php
 
-local l = require('lexer')
-local token, word_match = l.token, l.word_match
-local P, R, S = lpeg.P, lpeg.R, lpeg.S
+local lexer = lexer
+local word_match = lexer.word_match
+local P, S = lpeg.P, lpeg.S
 
-local M = {_NAME = 'pico8'}
-
--- Whitespace
-local ws = token(l.WHITESPACE, l.space^1)
-
--- Comments
-local comment = token(l.COMMENT, '//' * l.nonnewline_esc^0)
-
--- Numbers
-local number = token(l.NUMBER, l.integer)
+local lex = lexer.new(...)
 
 -- Keywords
-local keyword = token(l.KEYWORD, word_match{
-  '__lua__', '__gfx__', '__gff__', '__map__', '__sfx__', '__music__'
-})
+lex:add_rule('keyword',
+  lex:tag(lexer.KEYWORD, lexer.word_match('__gff__ __map__ __sfx__ __music__')))
 
 -- Identifiers
-local identifier = token(l.IDENTIFIER, l.word)
+lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER, lexer.word))
+
+-- Comments
+lex:add_rule('comment', lex:tag(lexer.COMMENT, lexer.to_eol('//', true)))
+
+-- Numbers
+lex:add_rule('number', lex:tag(lexer.NUMBER, lexer.integer))
 
 -- Operators
-local operator = token(l.OPERATOR, S('_'))
-
-M._rules = {
-  {'whitespace', ws},
-  {'keyword', keyword},
-  {'identifier', identifier},
-  {'comment', comment},
-  {'number', number},
-  {'operator', operator},
-}
+lex:add_rule('operator', lex:tag(lexer.OPERATOR, '_'))
 
 -- Embed Lua into PICO-8.
-local lua = l.load('lua')
+local lua = lexer.load('lua')
+local lua_start_rule = lex:tag(lexer.KEYWORD, word_match('__lua__'))
+local lua_end_rule = lex:tag(lexer.KEYWORD, word_match('__gfx__'))
+lex:embed(lua, lua_start_rule, lua_end_rule)
 
-local lua_start_rule = token('pico8_tag', '__lua__')
-local lua_end_rule = token('pico8_tag', '__gfx__' )
-l.embed_lexer(M, lua, lua_start_rule, lua_end_rule)
+lexer.property['scintillua.comment'] = '//'
 
-M._tokenstyles = {
-  pico8_tag = l.STYLE_EMBEDDED
-}
-
-M._foldsymbols = lua._foldsymbols
-
-return M
+return lex
