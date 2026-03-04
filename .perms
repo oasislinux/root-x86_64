@@ -9,7 +9,6 @@
 040755 proc
 040700 root
 040755 run
-040755 share/git-core/templates/branches
 040755 share/git-core/templates/hooks
 040755 sys
 040755 tmp
