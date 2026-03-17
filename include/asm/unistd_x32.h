@@ -1,5 +1,5 @@
-#ifndef _ASM_X86_UNISTD_X32_H
-#define _ASM_X86_UNISTD_X32_H 1
+#ifndef _ASM_UNISTD_X32_H
+#define _ASM_UNISTD_X32_H
 
 #define __NR_read (__X32_SYSCALL_BIT + 0)
 #define __NR_write (__X32_SYSCALL_BIT + 1)
@@ -366,4 +366,5 @@
 #define __NR_preadv2 (__X32_SYSCALL_BIT + 546)
 #define __NR_pwritev2 (__X32_SYSCALL_BIT + 547)
 
-#endif /* _ASM_X86_UNISTD_X32_H */
+
+#endif /* _ASM_UNISTD_X32_H */

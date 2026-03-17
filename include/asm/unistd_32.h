@@ -1,5 +1,5 @@
-#ifndef _ASM_X86_UNISTD_32_H
-#define _ASM_X86_UNISTD_32_H 1
+#ifndef _ASM_UNISTD_32_H
+#define _ASM_UNISTD_32_H
 
 #define __NR_restart_syscall 0
 #define __NR_exit 1
@@ -454,4 +454,5 @@
 #define __NR_lsm_list_modules 461
 #define __NR_mseal 462
 
-#endif /* _ASM_X86_UNISTD_32_H */
+
+#endif /* _ASM_UNISTD_32_H */

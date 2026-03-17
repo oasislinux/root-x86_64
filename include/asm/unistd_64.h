@@ -1,5 +1,5 @@
-#ifndef _ASM_X86_UNISTD_64_H
-#define _ASM_X86_UNISTD_64_H 1
+#ifndef _ASM_UNISTD_64_H
+#define _ASM_UNISTD_64_H
 
 #define __NR_read 0
 #define __NR_write 1
@@ -377,4 +377,5 @@
 #define __NR_lsm_list_modules 461
 #define __NR_mseal 462
 
-#endif /* _ASM_X86_UNISTD_64_H */
+
+#endif /* _ASM_UNISTD_64_H */
