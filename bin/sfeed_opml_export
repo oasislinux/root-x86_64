@@ -1,0 +1,63 @@
+#!/bin/sh
+
+# load config (evaluate shellscript).
+# loadconfig(configfile)
+loadconfig() {
+	# allow to specify config via argv[1].
+	if [ "$1" != "" ]; then
+		# get absolute path of config file required for including.
+		config="$1"
+		configpath=$(readlink -f "${config}" 2>/dev/null)
+	else
+		# default config location.
+		config="$HOME/.sfeed/sfeedrc"
+		configpath="${config}"
+	fi
+
+	# config is loaded here to be able to override $sfeedpath or functions.
+	if [ -r "${configpath}" ] && [ -f "${configpath}" ]; then
+		. "${configpath}"
+	else
+		printf "Configuration file \"%s\" cannot be read.\n" "${config}" >&2
+		echo "See the sfeedrc.example file or the sfeedrc(5) man page for an example." >&2
+		exit 1
+	fi
+}
+
+# override feed function to output OPML XML.
+# feed(name, feedurl, [basesiteurl], [encoding])
+feed() {
+	# uses the characters 0x1f and 0x1e as a separator.
+	printf '%s\037%s\036' "$1" "$2"
+}
+
+# load config file.
+loadconfig "$1"
+
+cat <<!
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+<head>
+	<title>OPML export</title>
+</head>
+<body>
+!
+
+feeds | LC_ALL=C awk '
+BEGIN {
+	FS = "\x1f"; RS = "\x1e";
+}
+{
+	gsub("&", "\\&amp;");
+	gsub("\"", "\\&quot;");
+	gsub("'"'"'", "\\&#39;");
+	gsub("<", "\\&lt;");
+	gsub(">", "\\&gt;");
+
+	print "\t<outline type=\"rss\" title=\"" $1 "\" text=\"" $1 "\" xmlUrl=\"" $2 "\"/>";
+}'
+
+cat <<!
+</body>
+</opml>
+!

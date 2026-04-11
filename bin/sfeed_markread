@@ -1,0 +1,35 @@
+#!/bin/sh
+# Mark items as read/unread: the input is the read / unread URL per line.
+
+usage() {
+	printf "usage: %s <read|unread> [urlfile]\n" "$0" >&2
+	echo "" >&2
+	echo "An urlfile must be specified as an argument or with the environment variable \$SFEED_URL_FILE" >&2
+	exit 1
+}
+
+urlfile="${2:-${SFEED_URL_FILE}}"
+if [ -z "${urlfile}" ]; then
+	usage
+fi
+
+case "$1" in
+read)
+	cat >> "${urlfile}"
+	;;
+unread)
+	tmp="$(mktemp)" || exit 1
+	trap "rm -f ${tmp}" EXIT
+	[ -f "${urlfile}" ] || touch "${urlfile}" 2>/dev/null
+	LC_ALL=C awk -F '\t' '
+	{ FILENR += (FNR == 1) }
+	FILENR == 1 { urls[$0] = 1 }
+	FILENR == 2 { if (!urls[$0]) { print $0 } }
+	END { exit(FILENR != 2) }' \
+		"-" "${urlfile}" > "${tmp}" && \
+		cp "${tmp}" "${urlfile}"
+	;;
+*)
+	usage
+	;;
+esac

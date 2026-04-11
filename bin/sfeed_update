@@ -1,0 +1,256 @@
+#!/bin/sh
+# update feeds, merge with old feeds.
+# NOTE: assumes "sfeed_*" executables are in $PATH.
+
+# defaults
+sfeedpath="$HOME/.sfeed/feeds"
+
+# used for processing feeds concurrently: wait until ${maxjobs} amount of
+# feeds are finished at a time.
+maxjobs=16
+
+# load config (evaluate shellscript).
+# loadconfig(configfile)
+loadconfig() {
+	# allow to specify config via argv[1].
+	if [ "$1" != "" ]; then
+		# get absolute path of config file required for including.
+		config="$1"
+		configpath=$(readlink -f "${config}" 2>/dev/null)
+	else
+		# default config location.
+		config="$HOME/.sfeed/sfeedrc"
+		configpath="${config}"
+	fi
+
+	# config is loaded here to be able to override $sfeedpath or functions.
+	if [ -r "${configpath}" ] && [ -f "${configpath}" ]; then
+		. "${configpath}"
+	else
+		printf "Configuration file \"%s\" cannot be read.\n" "${config}" >&2
+		echo "See the sfeedrc.example file or the sfeedrc(5) man page for an example." >&2
+		die
+	fi
+}
+
+# log(name, s)
+log() {
+	printf '[%s] %-50.50s %s\n' "$(date +'%H:%M:%S')" "$1" "$2"
+}
+
+# log_error(name, s)
+log_error() {
+	printf '[%s] %-50.50s %s\n' "$(date +'%H:%M:%S')" "$1" "$2" >&2
+	# set error exit status indicator for parallel jobs.
+	rm -f "${sfeedtmpdir}/ok"
+}
+
+# fetch a feed via HTTP/HTTPS etc.
+# fetch(name, url, feedfile)
+fetch() {
+	# fail on redirects, hide User-Agent, timeout is 15 seconds.
+	curl -L --max-redirs 0 -H "User-Agent:" -f -s -m 15 \
+		"$2" 2>/dev/null
+}
+
+# convert encoding from one encoding to another.
+# convertencoding(name, from, to)
+convertencoding() {
+	if [ "$2" != "" ] && [ "$3" != "" ] && [ "$2" != "$3" ]; then
+		iconv -cs -f "$2" -t "$3" 2> /dev/null
+	else
+		# else no convert, just output.
+		cat
+	fi
+}
+
+# parse and convert input, by default XML to the sfeed(5) TSV format.
+# parse(name, feedurl, basesiteurl)
+parse() {
+	sfeed "$3"
+}
+
+# filter fields.
+# filter(name, url)
+filter() {
+	cat
+}
+
+# merge raw files: unique sort by id, title, link.
+# merge(name, oldfile, newfile)
+merge() {
+	sort -t '	' -u -k6,6 -k2,2 -k3,3 "$3" "$2" 2>/dev/null
+}
+
+# order by timestamp (descending).
+# order(name, url)
+order() {
+	sort -t '	' -k1rn,1 2>/dev/null
+}
+
+# internal handler to fetch and process a feed.
+# _feed(name, feedurl, [basesiteurl], [encoding])
+_feed() {
+	name="$1"
+	feedurl="$2"
+	basesiteurl="$3"
+	encoding="$4"
+
+	filename="$(printf '%s' "${name}" | tr '/' '_')"
+	sfeedfile="${sfeedpath}/${filename}"
+	tmpfeedfile="${sfeedtmpdir}/feeds/${filename}"
+
+	# if file does not exist yet create it.
+	[ -e "${sfeedfile}" ] || touch "${sfeedfile}" 2>/dev/null
+
+	if ! fetch "${name}" "${feedurl}" "${sfeedfile}" > "${tmpfeedfile}.fetch"; then
+		log_error "${name}" "FAIL (FETCH)"
+		return 1
+	fi
+
+	# try to detect encoding (if not specified). if detecting the encoding fails assume utf-8.
+	[ "${encoding}" = "" ] && encoding=$(sfeed_xmlenc < "${tmpfeedfile}.fetch")
+
+	if ! convertencoding "${name}" "${encoding}" "utf-8" < "${tmpfeedfile}.fetch" > "${tmpfeedfile}.utf8"; then
+		log_error "${name}" "FAIL (ENCODING)"
+		return 1
+	fi
+	rm -f "${tmpfeedfile}.fetch"
+
+	# if baseurl is empty then use feedurl.
+	if ! parse "${name}" "${feedurl}" "${basesiteurl:-${feedurl}}" < "${tmpfeedfile}.utf8" > "${tmpfeedfile}.tsv"; then
+		log_error "${name}" "FAIL (PARSE)"
+		return 1
+	fi
+	rm -f "${tmpfeedfile}.utf8"
+
+	if ! filter "${name}" "${feedurl}" < "${tmpfeedfile}.tsv" > "${tmpfeedfile}.filter"; then
+		log_error "${name}" "FAIL (FILTER)"
+		return 1
+	fi
+	rm -f "${tmpfeedfile}.tsv"
+
+	# new feed data is empty: no need for below stages.
+	if [ ! -s "${tmpfeedfile}.filter" ]; then
+		log "${name}" "OK"
+		return 0
+	fi
+
+	if ! merge "${name}" "${sfeedfile}" "${tmpfeedfile}.filter" > "${tmpfeedfile}.merge"; then
+		log_error "${name}" "FAIL (MERGE)"
+		return 1
+	fi
+	rm -f "${tmpfeedfile}.filter"
+
+	if ! order "${name}" "${feedurl}" < "${tmpfeedfile}.merge" > "${tmpfeedfile}.order"; then
+		log_error "${name}" "FAIL (ORDER)"
+		return 1
+	fi
+	rm -f "${tmpfeedfile}.merge"
+
+	# copy
+	if ! cp "${tmpfeedfile}.order" "${sfeedfile}"; then
+		log_error "${name}" "FAIL (COPY)"
+		return 1
+	fi
+	rm -f "${tmpfeedfile}.order"
+
+	# OK
+	log "${name}" "OK"
+	return 0
+}
+
+# fetch and process a feed in parallel.
+# feed(name, feedurl, [basesiteurl], [encoding])
+feed() {
+	# Output job parameters for xargs.
+	# Specify fields as a single parameter separated by a NUL byte.
+	# The parameter is split into fields later by the child process, this
+	# allows using xargs with empty fields across many implementations.
+	printf '%s\037%s\037%s\037%s\037%s\037%s\0' \
+		"${config}" "${sfeedtmpdir}" "$1" "$2" "$3" "$4"
+}
+
+# cleanup()
+cleanup() {
+	# remove temporary directory with feed files.
+	rm -rf "${sfeedtmpdir}"
+}
+
+# die(statuscode)
+die() {
+	statuscode="${1:-1}" # default: exit 1
+	# cleanup temporary files etc.
+	cleanup
+	exit "${statuscode}"
+}
+
+# sighandler(signo)
+sighandler() {
+	signo="$1"
+	# ignore TERM signal for myself.
+	trap -- "" TERM
+	# kill all running children >:D
+	kill -TERM -$$
+}
+
+# feeds()
+feeds() {
+	printf "Configuration file \"%s\" is invalid or does not contain a \"feeds\" function.\n" "${config}" >&2
+	echo "See sfeedrc.example for an example." >&2
+	die
+}
+
+# runfeeds()
+runfeeds() {
+	# print feeds for parallel processing with xargs.
+	feeds > "${sfeedtmpdir}/jobs" || die
+	SFEED_UPDATE_CHILD="1" xargs -x -0 -P "${maxjobs}" -n 1 \
+		"$(readlink -f "${argv0}")" < "${sfeedtmpdir}/jobs"
+}
+
+# main(args...)
+main() {
+	# signal number received for parent.
+	signo=0
+	# SIGINT: signal to interrupt parent.
+	trap -- "sighandler 2" "INT"
+	# SIGTERM: signal to terminate parent.
+	trap -- "sighandler 15" "TERM"
+	# load config file.
+	loadconfig "$1"
+	# fetch feeds and store in temporary directory.
+	sfeedtmpdir="$(mktemp -d "${TMPDIR:-/tmp}/sfeed_XXXXXX")" || die
+	mkdir -p "${sfeedtmpdir}/feeds"
+	touch "${sfeedtmpdir}/ok" || die
+	# make sure path exists.
+	mkdir -p "${sfeedpath}"
+	# run and process the feeds.
+	runfeeds
+	statuscode=$?
+
+	# check error exit status indicator for parallel jobs.
+	[ -f "${sfeedtmpdir}/ok" ] || statuscode=1
+	# on signal SIGINT and SIGTERM exit with signal number + 128.
+	[ ${signo} -ne 0 ] && die $((signo+128))
+	die ${statuscode}
+}
+
+# process a single feed.
+# parameters are: config, tmpdir, name, feedurl, basesiteurl, encoding
+if [ "${SFEED_UPDATE_CHILD}" = "1" ]; then
+	[ "$1" = "" ] && exit 0 # must have an argument set
+	# IFS is "\037"
+	printf '%s\n' "$1" | \
+	while IFS="" read -r _config _tmpdir _name _feedurl _basesiteurl _encoding; do
+		loadconfig "${_config}"
+		sfeedtmpdir="${_tmpdir}"
+		_feed "${_name}" "${_feedurl}" "${_basesiteurl}" "${_encoding}"
+		exit "$?"
+	done
+	exit 0
+fi
+
+# ...else parent mode:
+argv0="$0" # store $0, in the zsh shell $0 is the name of the function.
+[ "${SFEED_UPDATE_INCLUDE}" = "1" ] || main "$@"
