@@ -17,12 +17,16 @@ if not {
 }
 fn sigexit
 if(! ~ $#cflag 0){
-	if(flag l && test -r $profile) . $profile
+	if(flag l) {
+		. -q $profile
+	}
 	status=''
 	eval $cflag
 }
 if not if(flag i){
-	if(flag l && test -r $profile) . $profile
+	if(flag l) {
+		. -q $profile
+	}
 	status=''
 	if(! ~ $#* 0) . $*
 	. -i /proc/self/fd/0
@@ -32,4 +36,3 @@ if not{
 	status=''
 	. $*
 }
-exit $status
