@@ -78,51 +78,47 @@ fi
 merge_base=$(git merge-base $baserev $headrev) ||
 die "fatal: No commits in common between $base and $head"
 
-# $head is the refname from the command line.
-# Find a ref with the same name as $head that exists at the remote
+find_matching_ref () {
+	while read sha1 ref
+	do
+		case "$ref" in
+		*"^"?*)
+			ref="${ref%"^"*}"
+			deref=true
+			;;
+		*)
+			deref=
+			;;
+		esac
+
+		if test "$sha1" = "${remote:-HEAD}"
+		then
+			echo "$sha1 $sha1"
+			break
+		fi
+
+		case "$ref" in
+		"${remote:-HEAD}"|*"/${remote:-HEAD}")
+			if test -z "$deref"
+			then
+				# Remember the matching unpeeled object on the
+				# remote side.
+				remote_sha1="$sha1"
+			fi
+
+			if test "$sha1" = "$headrev"
+			then
+				echo "${remote_sha1:-$headrev} $ref"
+				break
+			fi
+			;;
+		esac
+	done
+}
+
+# Find a ref with the same name as $remote that exists at the remote
 # and points to the same commit as the local object.
-find_matching_ref='
-	function endswith(s, t) {
-		n = length(s)
-		m = length(t)
-		return m <= n && substr(s, n - m + 1) == t
-	}
-
-	{
-		sha1 = $1
-		ref = $2
-
-		if (sha1 == head) {
-			found = remote_sha1 = sha1
-			exit
-		}
-
-		deref = index(ref, "^")
-		if (deref)
-			ref = substr(ref, 1, deref - 1)
-
-		if (ref == head || endswith(ref, "/" head)) {
-			if (!deref) {
-				# Remember the matching object on the remote side
-				remote_sha1 = sha1
-			}
-			if (sha1 == headrev) {
-				found = ref
-				exit
-			}
-		}
-	}
-
-	END {
-		if (found) {
-			if (!remote_sha1)
-				remote_sha1 = headrev
-			print remote_sha1 " " found
-		}
-	}
-'
-
-set fnord $(git ls-remote "$url" | awk -v "head=${remote:-HEAD}" -v "headrev=$headrev" "$find_matching_ref")
+set fnord $(git ls-remote "$url" | find_matching_ref)
 remote_sha1=$2
 ref=$3
 
